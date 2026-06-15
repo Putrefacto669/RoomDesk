@@ -1,0 +1,6 @@
+flask
+flask-cors
+reportlab
+matplotlib
+numpy
+gunicorn
