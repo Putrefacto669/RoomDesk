@@ -1,0 +1,460 @@
+/* ==========================================================================
+   VARIABLES DE DISEÑO (DEFAULT: DARK MODE)
+   ========================================================================== */
+:root {
+  --bg-color: #0a0a0c;
+  --blob-1: #0a84ff;
+  --blob-2: #bf5af2;
+  --blob-opacity: 0.4;
+  
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  
+  --text-main: #ffffff;
+  --text-sub: #8e8e93;
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --btn-bg: rgba(255, 255, 255, 0.12);
+  --btn-border: rgba(255, 255, 255, 0.15);
+  --btn-text: #ffffff;
+  --btn-hover-bg: #ffffff;
+  --btn-hover-text: #0a0a0c;
+  
+  --accent-blue: #0a84ff;
+  --accent-glow: rgba(10, 132, 255, 0.3);
+  --avatar-circle-bg: #111a24;
+  
+  --error-color: #ff375f;
+  --error-glow: rgba(255, 55, 95, 0.3);
+}
+
+/* ==========================================================================
+   VARIABLES DE DISEÑO (LIGHT MODE)
+   ========================================================================== */
+body.light-mode {
+  --bg-color: #f2f2f7;
+  --blob-1: #007aff;
+  --blob-2: #af52de;
+  --blob-opacity: 0.25;
+  
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: rgba(0, 0, 0, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+  
+  --text-main: #1c1c1e;
+  --text-sub: #68686e;
+  --input-bg: rgba(0, 0, 0, 0.04);
+  --btn-bg: #1c1c1e;
+  --btn-border: transparent;
+  --btn-text: #ffffff;
+  --btn-hover-bg: #007aff;
+  --btn-hover-text: #ffffff;
+  
+  --accent-blue: #007aff;
+  --accent-glow: rgba(0, 122, 255, 0.2);
+  --avatar-circle-bg: #e5f1fa;
+  
+  --error-color: #ff375f;
+  --error-glow: rgba(255, 55, 95, 0.25);
+}
+
+/* ==========================================================================
+   ESTILOS BASE & COMPORTAMIENTO RESPONSIVO (iOS STYLE)
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--bg-color);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  transition: background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Fondo Mesh con gradientes líquidos */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle 45vw at 20% 25%, var(--blob-1), transparent),
+    radial-gradient(circle 40vw at 80% 75%, var(--blob-2), transparent);
+  opacity: var(--blob-opacity);
+  filter: blur(70px);
+  z-index: 0;
+  transition: opacity 0.4s ease, background 0.4s ease;
+}
+
+/* ==========================================================================
+   BOTÓN CONMUTADOR DE TEMA (THEME TOGGLE)
+   ========================================================================== */
+.theme-toggle-btn {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top));
+  right: calc(20px + env(safe-area-inset-right));
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px var(--glass-shadow);
+  transition: transform 0.2s ease, background-color 0.3s, color 0.3s;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.92);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.theme-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+body.light-mode .sun-icon { 
+  display: none; 
+}
+
+body:not(.light-mode) .moon-icon { 
+  display: none; 
+}
+
+/* ==========================================================================
+   CONTENEDOR DEL FORMULARIO
+   ========================================================================== */
+form {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(190%);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    0 30px 60px -15px var(--glass-shadow),
+    inset 0 1px 2px var(--glass-highlight);
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+}
+
+@media (max-width: 479px) {
+  form {
+    max-width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    justify-content: center;
+    padding: 3em 2em calc(2em + env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+  form > div.wrapper-inner {
+    width: 100%;
+    margin: auto 0;
+  }
+}
+
+@media (min-width: 480px) {
+  form {
+    max-width: 410px;
+    padding: 2.5em;
+    border-radius: 32px;
+  }
+}
+
+/* ==========================================================================
+   CONTENEDOR DEL AVATAR & PROPIEDADES SVG (CORREGIDO PARA GSAP)
+   ========================================================================== */
+form .svgContainer {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  margin: 0 auto 1.8em;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+body.light-mode form .svgContainer {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+form .svgContainer div {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+}
+
+form .svgContainer .mySVG {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#avatarBgCircle {
+  fill: var(--avatar-circle-bg);
+  transition: fill 0.4s ease;
+}
+
+/* Puntos de pivote para animaciones GSAP de los brazos */
+form .svgContainer .armL {
+  transform-origin: top left;
+}
+
+form .svgContainer .armR {
+  transform-origin: top right;
+}
+
+/* ==========================================================================
+   INPUT GROUPS & CAMPOS DE TEXTO
+   ========================================================================== */
+form .inputGroup {
+  margin-bottom: 1.4em;
+  position: relative;
+}
+
+form .inputGroup:last-of-type {
+  margin-bottom: 0;
+}
+
+form label {
+  margin-bottom: 6px;
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  transition: color 0.25s ease;
+}
+
+form .inputGroup:focus-within label {
+  color: var(--accent-blue);
+}
+
+form input[type='text'], 
+form input[type='password'] {
+  display: block;
+  padding: 18px 1em 0px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  width: 100%;
+  height: 58px;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  color: var(--text-main);
+  font-weight: 500;
+  font-family: inherit;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s, color 0.25s;
+}
+
+form input::placeholder {
+  color: transparent;
+  transition: color 0.25s;
+}
+
+form input:focus::placeholder {
+  color: var(--text-sub);
+  opacity: 0.4;
+}
+
+form input[type='text']:focus, 
+form input[type='password']:focus {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+form input[type='text']:focus-visible, 
+form input[type='password']:focus-visible {
+  outline: none;
+}
+
+body.light-mode form input[type='text']:focus, 
+body.light-mode form input[type='password']:focus {
+  background-color: #ffffff;
+}
+
+/* ==========================================================================
+   ESTADOS DE ERROR EN INPUTS
+   ========================================================================== */
+form input.error {
+  border-color: var(--error-color);
+  box-shadow: 0 0 14px var(--error-glow);
+}
+
+form .inputGroup .error-message {
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 6px;
+  padding-left: 4px;
+  font-weight: 500;
+  display: none;
+  animation: fadeIn 0.2s ease;
+}
+
+form .inputGroup.error .error-message {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-4px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* ==========================================================================
+   LÓGICA DEL TEXTO FLOTANTE (CALCULADO POR JS)
+   ========================================================================== */
+form .inputGroup1 .helper {
+  position: absolute;
+  z-index: 1;
+  font-family: inherit;
+  pointer-events: none;
+}
+
+form .inputGroup1 .helper1 {
+  top: 18px;
+  left: 1em;
+  color: var(--text-sub);
+  font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.5;
+  transform-origin: top left;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
+              opacity 0.2s ease, 
+              color 0.2s ease;
+}
+
+form .inputGroup1.focusWithText .helper1 {
+  transform: translateY(-9px) scale(0.72);
+  opacity: 0.8;
+  color: var(--accent-blue);
+}
+
+/* Regla oculta necesaria para calcular el ancho dinámico del texto en main.js */
+.reference-div {
+  position: absolute;
+  visibility: hidden;
+  height: auto;
+  width: auto;
+  white-space: nowrap;
+  font-size: 1.15rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   BOTÓN SUBMIT (ESTILO DE ACCIÓN PREMIUM)
+   ========================================================================== */
+form button {
+  display: block;
+  width: 100%;
+  height: 52px;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 14px;
+  font-size: 1.05rem;
+  color: var(--btn-text);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background 0.25s, color 0.25s, transform 0.1s, border-color 0.25s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+form button:hover {
+  background: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
+  border-color: var(--btn-hover-bg);
+}
+
+form button:active {
+  transform: scale(0.97);
+}
+
+form button:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   UTILIDADES EXTRA PARA ANIMACIONES Y EFECTOS
+   ========================================================================== */
+
+/* Reducción de movimiento para usuarios que lo prefieran */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mejora de scroll en iOS */
+@supports (-webkit-overflow-scrolling: touch) {
+  form {
+    -webkit-overflow-scrolling: touch;
+  }
+}
