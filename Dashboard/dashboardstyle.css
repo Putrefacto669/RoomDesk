@@ -27,8 +27,12 @@
     
     /* Componentes del Dashboard */
     --card-bg: rgba(255, 255, 255, 0.45);
+    --input-bg: rgba(255, 255, 255, 0.4);
     --text-main: #1d1d1f;
     --text-sub: #86868b;
+    --success-color: #1acc3c;
+    --danger-color: #ff375f;
+    --warning-color: #ff9f0a;
     
     --nav-height: 44px;
 }
@@ -59,6 +63,7 @@
     
     /* Componentes del Dashboard */
     --card-bg: rgba(28, 28, 30, 0.6);
+    --input-bg: rgba(0, 0, 0, 0.25);
     --text-main: #ffffff;
     --text-sub: #8e8e93;
 }
@@ -73,18 +78,21 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
-    height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg-color);
     color: var(--text-main);
     -webkit-font-smoothing: antialiased;
-    overflow: hidden;
+    overflow: hidden; /* El scroll real ocurre dentro de .main-content, no en body */
     transition: background 0.5s ease;
 }
 
 .bg-mesh {
-    position: absolute;
+    position: fixed;
     inset: 0;
     z-index: -1;
     overflow: hidden;
@@ -110,6 +118,10 @@ body {
     100% { transform: translate(-2%, -4%) scale(0.95) rotate(-4deg); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .blob { animation: none; }
+}
+
 /* ==========================================================================
    3. MAQUETACIÓN ESTRUCTURAL (DASHBOARD CONTAINER)
    ========================================================================== */
@@ -129,6 +141,7 @@ body {
     flex-direction: column;
     gap: 20px;
     height: 100vh;
+    min-width: 0;
 }
 
 .sidebar-header h2 {
@@ -173,7 +186,7 @@ body {
     z-index: 5;
 }
 
-/* Área de brillo dinámico por mouse */
+/* Área de brillo dinámico por mouse (solo aplica con cursor, es decoración de escritorio) */
 .liquid-glare-container {
     position: absolute;
     inset: 0;
@@ -236,17 +249,31 @@ body {
     transition: color 0.25s ease;
     outline: none;
     z-index: 3;
+    flex-shrink: 0;
+}
+
+.nav-btn:focus-visible {
+    outline: 2px solid var(--icon-active);
+    outline-offset: 2px;
 }
 
 .btn-content {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
+}
+
+.btn-content span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .btn-content svg {
     stroke-width: 2.2;
     transition: transform 0.2s ease;
+    flex-shrink: 0;
 }
 
 .nav-btn.active { color: var(--text-main); }
@@ -259,6 +286,7 @@ body {
     background: var(--divider);
     margin: 8px 0;
     z-index: 4;
+    flex-shrink: 0;
 }
 
 /* Selector de Tema (Dark/Light mode) */
@@ -275,6 +303,7 @@ body {
     align-items: center;
     justify-content: center;
     transition: color 0.25s, background-color 0.2s;
+    flex-shrink: 0;
 }
 
 .theme-btn:hover {
@@ -311,6 +340,8 @@ body {
     z-index: 4;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
+    flex-shrink: 0;
+    min-width: 0;
 }
 
 .avatar-wrapper {
@@ -323,22 +354,31 @@ body {
     justify-content: center;
     box-shadow: var(--pill-shadow);
     color: var(--text-main);
+    flex-shrink: 0;
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .user-name {
     color: var(--text-main);
     font-size: 13px;
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-role {
     color: var(--text-sub);
     font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -348,15 +388,22 @@ body {
     padding: 40px;
     height: 100vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     gap: 28px;
+    min-width: 0;
+}
+
+.main-header {
+    min-width: 0;
 }
 
 .main-header h1 {
     font-size: 30px;
     font-weight: 700;
     letter-spacing: -0.6px;
+    overflow-wrap: break-word;
 }
 
 .main-header p {
@@ -384,7 +431,8 @@ body {
     align-items: center;
     gap: 8px;
     box-shadow: var(--pill-shadow);
-    transition: transform 0.15s ease, background-color 0.2s;
+    transition: transform 0.15s ease, background-color 0.2s, opacity 0.2s;
+    white-space: nowrap;
 }
 
 .btn-primary:hover {
@@ -393,6 +441,12 @@ body {
 }
 
 .btn-primary:active { transform: scale(0.97); }
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
 
 /* Grid de Reportes Rápidos (Cards) */
 .dashboard-cards {
@@ -409,6 +463,7 @@ body {
     padding: 24px;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    min-width: 0;
 }
 
 .card h3 {
@@ -431,6 +486,7 @@ body {
    ========================================================================== */
 .content-data {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .data-box {
@@ -443,6 +499,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
 }
 
 .data-box h3 {
@@ -464,7 +521,9 @@ body {
 /* Contenedor Responsivo de Tablas */
 .table-responsive {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-radius: 14px;
     border: 1px solid var(--glass-border);
     background: rgba(255, 255, 255, 0.01);
@@ -472,6 +531,7 @@ body {
 
 .crud-table {
     width: 100%;
+    min-width: 560px; /* Fuerza scroll horizontal en vez de aplastar columnas ilegibles */
     border-collapse: collapse;
     text-align: left;
     font-size: 14px;
@@ -486,6 +546,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid var(--divider);
+    white-space: nowrap;
 }
 
 [data-theme="dark"] .crud-table th {
@@ -496,10 +557,16 @@ body {
     padding: 14px 16px;
     border-bottom: 1px solid var(--divider);
     color: var(--text-main);
+    vertical-align: middle;
 }
 
 .crud-table tr:last-child td {
     border-bottom: none;
+}
+
+.crud-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
 }
 
 .crud-table tbody tr:hover td {
@@ -509,8 +576,62 @@ body {
     background: rgba(255, 255, 255, 0.02);
 }
 
-.table-btn-edit { color: var(--icon-active); margin-right: 10px; cursor: pointer; background:none; border:none; font-weight:600;}
-.table-btn-delete { color: #ff453a; cursor: pointer; background:none; border:none; font-weight:600;}
+.cell-subtext {
+    display: block;
+    color: var(--text-sub);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.badge-channel {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--glass-border);
+    white-space: nowrap;
+}
+
+/* Botones de acción (editar/eliminar) dentro de las tablas */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 9px;
+    color: var(--icon-active);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+.btn-icon:hover {
+    background: rgba(0, 122, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+.btn-icon:active {
+    transform: scale(0.94);
+}
+
+.btn-icon.delete,
+.btn-icon.delete-btn {
+    color: var(--danger-color);
+}
+
+.btn-icon.delete:hover {
+    background: rgba(255, 55, 95, 0.12);
+}
 
 /* ==========================================================================
    7. VENTANA MODAL FLUIDA (SISTEMA DE GESTIÓN CRUD)
@@ -528,6 +649,7 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    padding: 20px;
 }
 
 .modal-overlay.open {
@@ -541,12 +663,16 @@ body {
     -webkit-backdrop-filter: blur(30px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
+    max-height: 85vh;
     padding: 24px;
     box-shadow: 0 24px 50px var(--glass-shadow);
     transform: scale(0.92);
     transition: transform 0.3s cubic-bezier(0.34, 1.3, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .modal-overlay.open .modal-card { transform: scale(1); }
@@ -556,6 +682,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -572,6 +699,7 @@ body {
     cursor: pointer;
     line-height: 1;
     transition: color 0.2s;
+    padding: 4px 8px;
 }
 .btn-close-modal:hover { color: var(--text-main); }
 
@@ -579,6 +707,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+    /* Permite hacer scroll dentro del modal cuando el formulario es largo (ej. Reservaciones) o el teclado tapa parte de la pantalla */
 }
 
 #modal-form-fields .form-group {
@@ -586,6 +718,13 @@ body {
     flex-direction: column;
     gap: 6px;
     margin-bottom: 14px;
+    min-width: 0;
+}
+
+#modal-form-fields .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
 #modal-form-fields label {
@@ -600,27 +739,80 @@ body {
     padding: 10px 14px;
     border-radius: 10px;
     border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--input-bg);
     color: var(--text-main);
     font-family: inherit;
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
 }
-[data-theme="dark"] #modal-form-fields input,
-[data-theme="dark"] #modal-form-fields select {
-    background: rgba(0, 0, 0, 0.2);
+
+/* Flecha custom para selects (evita el estilo nativo feo de iOS/Android) */
+#modal-form-fields select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-sub) 50%), linear-gradient(135deg, var(--text-sub) 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(1em + 1px), calc(100% - 13px) calc(1em + 1px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
 }
 
 #modal-form-fields input:focus, 
 #modal-form-fields select:focus {
     border-color: var(--icon-active);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+#modal-form-fields input::placeholder {
+    color: var(--text-sub);
+    opacity: 0.7;
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     margin-top: 8px;
+    flex-shrink: 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--divider);
+}
+
+.modal-footer .btn-primary {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Ficha de detalle (vista de solo lectura dentro del modal) */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.detail-item.detail-full {
+    grid-column: 1 / -1;
+}
+
+.detail-item label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-sub);
+}
+
+.detail-item p {
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: break-word;
 }
 
 /* ==========================================================================
@@ -650,11 +842,25 @@ body {
 }
 
 /* ==========================================================================
-   9. ADAPTACIÓN RESPONSIVA COMPLETA (MÓVILES & TABLETS)
+   9. ADAPTACIÓN RESPONSIVA — TABLET (769px - 1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        grid-template-columns: 230px 1fr;
+    }
+
+    .main-content {
+        padding: 32px 28px;
+    }
+}
+
+/* ==========================================================================
+   10. ADAPTACIÓN RESPONSIVA COMPLETA (MÓVILES, hasta 768px)
    ========================================================================== */
 @media (max-width: 768px) {
     .dashboard-container {
         grid-template-columns: 1fr;
+        height: 100%;
     }
 
     /* Ocultar elementos decorativos o de escritorio */
@@ -668,15 +874,15 @@ body {
         bottom: 0;
         left: 0;
         right: 0;
-        height: calc(65px + env(safe-area-inset-bottom, 0px));
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
         padding: 0;
         z-index: 99;
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(40px) saturate(200%);
         -webkit-backdrop-filter: blur(40px) saturate(200%);
         border-top: 0.5px solid var(--divider);
     }
-    [data-theme="dark"] .sidebar { background: rgba(20, 20, 20, 0.4); }
+    [data-theme="dark"] .sidebar { background: rgba(20, 20, 20, 0.6); }
 
     .liquid-nav {
         background: transparent;
@@ -685,7 +891,7 @@ body {
         box-shadow: none;
         border: none;
         flex-direction: row;
-        padding: 4px 8px;
+        padding: 4px 4px;
         height: 100%;
         border-radius: 0;
     }
@@ -696,24 +902,30 @@ body {
         align-items: center;
         gap: 0;
         width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Ajuste de Píldora Activa Móvil */
     .active-pill {
-        height: 44px;
-        top: 6px;
+        height: 40px;
+        width: 40px !important;
+        top: 50%;
+        margin-top: -20px;
         border-radius: 10px;
     }
 
     /* Botones transformados a Tab Items */
     .nav-btn, .theme-btn {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
         padding: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
     }
 
     .btn-content {
@@ -722,8 +934,8 @@ body {
     }
 
     .btn-content svg {
-        width: 20px;
-        height: 20px;
+        width: 19px;
+        height: 19px;
     }
 
     /* Ocultar texto largo en móviles, mostrar solo iconos para evitar desborde */
@@ -735,29 +947,68 @@ body {
 
     /* Contenido Principal con Scroll Elástico */
     .main-content {
-        padding: 24px 16px calc(85px + env(safe-area-inset-bottom, 0px)) 16px;
-        gap: 20px;
-        overflow-y: scroll;
+        padding: 20px 16px calc(80px + env(safe-area-inset-bottom, 0px)) 16px;
+        gap: 18px;
+        height: 100%;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
 
-    .main-header h1 { font-size: 24px; }
+    .main-header h1 { font-size: 22px; }
+    .main-header p { font-size: 13px; }
     
     .dashboard-cards {
         grid-template-columns: 1fr;
         gap: 12px;
     }
 
+    .card { padding: 18px; }
+    .card-number { font-size: 30px; }
+
+    .crud-actions {
+        justify-content: stretch;
+    }
+
+    .crud-actions .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .data-box { padding: 16px; }
+
+    /* En móvil reducimos el ancho mínimo de la tabla para que un celular grande
+       muestre algo razonable sin scroll horizontal excesivo en tablas simples */
+    .crud-table {
+        min-width: 480px;
+        font-size: 13px;
+    }
+
+    .crud-table th, .crud-table td {
+        padding: 12px 10px;
+    }
+
+    .action-buttons {
+        gap: 6px;
+    }
+
+    .btn-icon {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+    }
+
     /* Ajuste de Modal a ventana deslizante inferior (Bottom Sheet) */
     .modal-overlay {
         align-items: flex-end;
+        padding: 0;
     }
 
     .modal-card {
         width: 100%;
         max-width: 100%;
+        max-height: 90vh;
         border-radius: 24px 24px 0 0;
-        padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 12px)) 20px;
+        padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 12px)) 18px;
         transform: translateY(100%);
     }
 
@@ -765,19 +1016,25 @@ body {
         transform: translateY(0);
     }
 
-    /* =====================================
-       AJUSTES DE BOTONES PARA MÓVIL
-       ===================================== */
-       
-   
+    /* En pantallas angostas, los pares de campos (form-row) pasan a una sola columna
+       para que no queden inputs minúsculos e ilegibles */
+    #modal-form-fields .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
 
     /* Reposicionar el botón de Logout a la barra inferior */
     .logout-button {
         position: static;
         top: auto;
         right: auto;
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
         padding: 0;
         background: transparent;
         border: none;
@@ -785,7 +1042,8 @@ body {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #ff375f; 
+        color: #ff375f;
+        flex-shrink: 0;
     }
 
     /* Ocultar el texto de "Cerrar sesión" en móvil */
@@ -796,8 +1054,8 @@ body {
     }
     
     .logout-button svg {
-        width: 20px;
-        height: 20px;
+        width: 19px;
+        height: 19px;
         margin: 0;
     }
 
@@ -805,7 +1063,48 @@ body {
         background: transparent;
         transform: none;
     }
+
+    /* ===== Reportes en móvil ===== */
+    .reports-container {
+        padding: 0;
+    }
+
+    .report-controls {
+        flex-direction: column;
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .report-type-group, .date-range-group {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .report-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .report-actions .btn-primary,
+    .report-actions .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
 }
+
+/* Pantallas muy angostas (iPhone SE y similares) */
+@media (max-width: 360px) {
+    .main-content {
+        padding: 16px 12px calc(80px + env(safe-area-inset-bottom, 0px)) 12px;
+    }
+
+    .main-header h1 { font-size: 20px; }
+
+    .modal-card {
+        padding: 16px 14px calc(14px + env(safe-area-inset-bottom, 12px)) 14px;
+    }
+}
+
 /* ========================================== */
 /* ESTILOS PARA REPORTES */
 /* ========================================== */
@@ -877,7 +1176,17 @@ body {
     font-weight: 600;
     cursor: pointer;
     color: var(--text-main);
+    transition: background-color 0.2s, transform 0.15s;
 }
+
+.btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+[data-theme="dark"] .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-secondary:active { transform: scale(0.97); }
 
 .report-preview {
     margin-bottom: 30px;
@@ -930,6 +1239,14 @@ body {
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.btn-icon-sm:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+[data-theme="dark"] .btn-icon-sm:hover {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .btn-download {
