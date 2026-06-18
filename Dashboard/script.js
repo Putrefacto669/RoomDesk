@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error('Error al cerrar sesión:', error);
         } finally {
             localStorage.clear();
-             window.location.href = "../Login/index.html";
+            window.location.href = "../Login/index.html";
         }
     }
 
@@ -150,19 +150,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             if (error) throw error;
             
-            if (data && data.length > 0) {
-                roomsData = data.map(room => ({
-                    id: room.id,
-                    number: room.number,
-                    type: room.type,
-                    status: room.status,
-                    price: parseFloat(room.price)
-                }));
-                
-                const availableRooms = roomsData.filter(r => r.status === 'Disponible').length;
-                const cardHabitaciones = document.querySelectorAll('.card-number')[2];
-                if (cardHabitaciones) cardHabitaciones.textContent = availableRooms;
-            }
+            roomsData = (data || []).map(room => ({
+                id: room.id,
+                number: room.number,
+                type: room.type,
+                status: room.status,
+                price: parseFloat(room.price)
+            }));
+
+            const availableRooms = roomsData.filter(r => r.status === 'Disponible').length;
+            const cardHabitaciones = document.querySelectorAll('.card-number')[2];
+            if (cardHabitaciones) cardHabitaciones.textContent = availableRooms;
+
             console.log('✅ Habitaciones cargadas:', roomsData.length);
         } catch (error) {
             console.error('Error al cargar habitaciones:', error);
@@ -183,24 +182,23 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             if (error) throw error;
             
-            if (data && data.length > 0) {
-                guestsData = data.map(res => ({
-                    id: res.id,
-                    name: res.guest_name,
-                    room: res.rooms?.number || 'Sin asignar',
-                    checkin: res.check_in,
-                    checkout: res.check_out,
-                    price: parseFloat(res.total_amount),
-                    channel: res.channel,
-                    email: res.guest_email,
-                    phone: res.guest_phone || 'No registrado',
-                    status: res.status
-                }));
-                
-                const activeReservations = data.filter(r => r.status === 'confirmed').length;
-                const cardReservas = document.querySelectorAll('.card-number')[0];
-                if (cardReservas) cardReservas.textContent = activeReservations;
-            }
+            guestsData = (data || []).map(res => ({
+                id: res.id,
+                name: res.guest_name,
+                room: res.rooms?.number || 'Sin asignar',
+                checkin: res.check_in,
+                checkout: res.check_out,
+                price: parseFloat(res.total_amount),
+                channel: res.channel,
+                email: res.guest_email,
+                phone: res.guest_phone || 'No registrado',
+                status: res.status
+            }));
+
+            const activeReservations = (data || []).filter(r => r.status === 'confirmed').length;
+            const cardReservas = document.querySelectorAll('.card-number')[0];
+            if (cardReservas) cardReservas.textContent = activeReservations;
+
             console.log('✅ Reservaciones cargadas:', guestsData.length);
         } catch (error) {
             console.error('Error al cargar reservaciones:', error);
@@ -240,15 +238,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             if (error) throw error;
             
-            if (data && data.length > 0) {
-                billingData = data.map(cons => ({
-                    id: cons.id,
-                    item: cons.item,
-                    category: cons.category,
-                    amount: parseFloat(cons.amount),
-                    date: cons.date.split('T')[0]
-                }));
-            }
+            billingData = (data || []).map(cons => ({
+                id: cons.id,
+                room: cons.rooms?.number || '',
+                item: cons.item,
+                category: cons.category,
+                amount: parseFloat(cons.amount),
+                date: cons.date.split('T')[0]
+            }));
+
             console.log('✅ Consumos cargados:', billingData.length);
         } catch (error) {
             console.error('Error al cargar consumos:', error);
@@ -413,9 +411,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             case 'reservations':
                 title = 'Reporte de Reservaciones';
                 headers = ['Huésped', 'Habitación', 'Check-In', 'Check-Out', 'Monto'];
-                data = guestsData.map(g => [g.name, g.room, g.checkin, g.checkout, `$${g.price}`]);
+                data = guestsData.map(g => [g.name, g.room, g.checkin, g.checkout, `Q${g.price}`]);
                 break;
-            case 'occupancy':
+            case 'occupancy': {
                 title = 'Reporte de Ocupación';
                 const totalRooms = roomsData.length;
                 const occupiedRooms = roomsData.filter(r => r.status === 'Ocupada').length;
@@ -425,24 +423,26 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ['Total Habitaciones', totalRooms],
                     ['Ocupadas', occupiedRooms],
                     ['Libres', freeRooms],
-                    ['Ocupación %', `${((occupiedRooms / totalRooms) * 100).toFixed(1)}%`]
+                    ['Ocupación %', totalRooms ? `${((occupiedRooms / totalRooms) * 100).toFixed(1)}%` : '0%']
                 ];
                 break;
+            }
             case 'guests':
                 title = 'Reporte de Huéspedes';
                 headers = ['Nombre', 'Email', 'Teléfono', 'Habitación', 'Estadía'];
                 data = guestsData.map(g => [g.name, g.email, g.phone, g.room, `${g.checkin} → ${g.checkout}`]);
                 break;
-            case 'revenue':
+            case 'revenue': {
                 title = 'Reporte de Ingresos';
                 const totalRevenue = guestsData.reduce((sum, g) => sum + g.price, 0);
                 headers = ['Concepto', 'Monto'];
-                data = [['Reservaciones', `$${totalRevenue}`], ['Total', `$${totalRevenue}`]];
+                data = [['Reservaciones', `Q${totalRevenue}`], ['Total', `Q${totalRevenue}`]];
                 break;
+            }
             case 'consumptions':
                 title = 'Reporte de Consumos';
                 headers = ['Concepto', 'Categoría', 'Fecha', 'Monto'];
-                data = billingData.map(b => [b.item, b.category, b.date, `$${b.amount}`]);
+                data = billingData.map(b => [b.item, b.category, b.date, `Q${b.amount}`]);
                 break;
         }
         
@@ -591,7 +591,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ==========================================
-    // 11. FUNCIONES CRUD CONECTADAS A SUPABASE
+    // 11. FUNCIONES CRUD CONECTADAS A SUPABASE (RESERVACIONES)
     // ==========================================
     async function saveReservationToSupabase(reservationData) {
         try {
@@ -665,6 +665,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    async function updateReservationInSupabase(targetId, dataObj) {
+        const { error } = await supabaseClient
+            .from('reservations')
+            .update({
+                guest_name: dataObj.name,
+                guest_email: dataObj.email,
+                guest_phone: dataObj.phone,
+                check_in: dataObj.checkin,
+                check_out: dataObj.checkout,
+                total_amount: dataObj.price,
+                channel: dataObj.channel,
+            })
+            .eq('id', targetId)
+            .eq('property_id', currentPropertyId);
+
+        if (error) throw error;
+
+        const { data: room } = await supabaseClient
+            .from('rooms')
+            .select('id')
+            .eq('number', dataObj.room)
+            .eq('property_id', currentPropertyId)
+            .single();
+
+        if (room) {
+            await supabaseClient
+                .from('reservations')
+                .update({ room_id: room.id })
+                .eq('id', targetId);
+        }
+    }
+
     async function deleteReservationFromSupabase(reservationId) {
         try {
             const { error } = await supabaseClient
@@ -678,6 +710,108 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error('Error al eliminar reservación:', error);
             throw error;
         }
+    }
+
+    // ==========================================
+    // 11B. FUNCIONES CRUD CONECTADAS A SUPABASE (HABITACIONES)
+    // ==========================================
+    async function saveRoomToSupabase(roomData) {
+        const { error } = await supabaseClient
+            .from('rooms')
+            .insert({
+                property_id: currentPropertyId,
+                number: roomData.number,
+                type: roomData.type,
+                status: roomData.status,
+                price: roomData.price
+            });
+        if (error) throw error;
+        console.log('✅ Habitación guardada en Supabase');
+    }
+
+    async function updateRoomInSupabase(targetId, roomData) {
+        const { error } = await supabaseClient
+            .from('rooms')
+            .update({
+                number: roomData.number,
+                type: roomData.type,
+                status: roomData.status,
+                price: roomData.price
+            })
+            .eq('id', targetId)
+            .eq('property_id', currentPropertyId);
+        if (error) throw error;
+        console.log('✅ Habitación actualizada en Supabase');
+    }
+
+    async function deleteRoomFromSupabase(roomId) {
+        const { error } = await supabaseClient
+            .from('rooms')
+            .delete()
+            .eq('id', roomId);
+        if (error) throw error;
+        console.log('✅ Habitación eliminada de Supabase');
+    }
+
+    // ==========================================
+    // 11C. FUNCIONES CRUD CONECTADAS A SUPABASE (CONSUMO)
+    // ==========================================
+    async function saveConsumptionToSupabase(consumptionData) {
+        const { data: room } = await supabaseClient
+            .from('rooms')
+            .select('id')
+            .eq('number', consumptionData.room)
+            .eq('property_id', currentPropertyId)
+            .single();
+
+        if (!room) throw new Error('Habitación no encontrada para registrar el consumo');
+
+        const { error } = await supabaseClient
+            .from('consumptions')
+            .insert({
+                property_id: currentPropertyId,
+                room_id: room.id,
+                item: consumptionData.item,
+                category: consumptionData.category,
+                amount: consumptionData.amount
+            });
+        if (error) throw error;
+        console.log('✅ Consumo guardado en Supabase');
+    }
+
+    async function updateConsumptionInSupabase(targetId, consumptionData) {
+        const updatePayload = {
+            item: consumptionData.item,
+            category: consumptionData.category,
+            amount: consumptionData.amount
+        };
+
+        if (consumptionData.room) {
+            const { data: room } = await supabaseClient
+                .from('rooms')
+                .select('id')
+                .eq('number', consumptionData.room)
+                .eq('property_id', currentPropertyId)
+                .single();
+            if (room) updatePayload.room_id = room.id;
+        }
+
+        const { error } = await supabaseClient
+            .from('consumptions')
+            .update(updatePayload)
+            .eq('id', targetId)
+            .eq('property_id', currentPropertyId);
+        if (error) throw error;
+        console.log('✅ Consumo actualizado en Supabase');
+    }
+
+    async function deleteConsumptionFromSupabase(consumptionId) {
+        const { error } = await supabaseClient
+            .from('consumptions')
+            .delete()
+            .eq('id', consumptionId);
+        if (error) throw error;
+        console.log('✅ Consumo eliminado de Supabase');
     }
 
     // ==========================================
@@ -723,7 +857,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
 
                 const tr = document.createElement("tr");
-                tr.setAttribute("data-guest-id", guest.id);
+                tr.setAttribute("data-record-id", guest.id);
                 tr.innerHTML = `
                     <td><strong>${guest.name}</strong></td>
                     <td><span class="badge-channel" style="font-weight:700;">${guest.room}</span></td>
@@ -764,7 +898,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 guestsData.forEach(guest => {
                     const tr = document.createElement("tr");
-                    tr.setAttribute("data-guest-id", guest.id);
+                    tr.setAttribute("data-record-id", guest.id);
                     tr.innerHTML = `
                         <td><strong>${guest.name}</strong></td>
                         <td><span class="badge-channel" style="font-weight:700;">${guest.room}</span></td>
@@ -807,6 +941,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (room.status === "Mantenimiento") statusStyle = "background:rgba(255,55,95,0.15); color:#ff375f;";
 
                     const tr = document.createElement("tr");
+                    tr.setAttribute("data-record-id", room.id);
                     tr.innerHTML = `
                         <td><strong>${room.number}</strong></td>
                         <td>${room.type}</td>
@@ -833,6 +968,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 crudTableHead.innerHTML = `
                     <tr>
+                        <th>Habitación</th>
                         <th>Concepto / Cargo</th>
                         <th>Categoría</th>
                         <th>Fecha de Cargo</th>
@@ -843,8 +979,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 billingData.forEach(item => {
                     const tr = document.createElement("tr");
+                    tr.setAttribute("data-record-id", item.id);
                     tr.innerHTML = `
-                        <td><strong>${item.item}</strong></td>
+                        <td><strong>${item.room || '—'}</strong></td>
+                        <td>${item.item}</td>
                         <td><span class="badge-channel">${item.category}</span></td>
                         <td>${item.date}</td>
                         <td><strong style="color:#1acc3c;">Q${item.amount.toFixed(2)}</strong></td>
@@ -884,7 +1022,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="detail-grid">
                 <div class="detail-item detail-full"><label>Nombre Completo</label><p>${guest.name}</p></div>
                 <div class="detail-item"><label>Habitación Asignada</label><p>${guest.room}</p></div>
-                <div class="detail-item"><label>Tarifa por Noche</label><p>Q${guest.price} USD</p></div>
+                <div class="detail-item"><label>Tarifa por Noche</label><p>Q${guest.price}</p></div>
                 <div class="detail-item"><label>Fecha Check-In</label><p>${guest.checkin}</p></div>
                 <div class="detail-item"><label>Fecha Check-Out</label><p>${guest.checkout}</p></div>
                 <div class="detail-item"><label>Canal de Reserva</label><p>${guest.channel}</p></div>
@@ -896,17 +1034,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (submitBtn) submitBtn.style.display = "none";
     }
 
+    // ==========================================
+    // 13B. FORMULARIOS DINÁMICOS POR SECCIÓN (UN CRUD DISTINTO CADA UNO)
+    // ==========================================
     function injectFormFields() {
         const submitBtn = document.getElementById("btn-submit-form");
         if (submitBtn) submitBtn.style.display = "block";
         
         if (!modalFormFields) return;
-        
+
         if (currentSection === "Reservaciones" || currentSection === "Huespedes" || currentSection === "Dashboard") {
             modalFormFields.innerHTML = `
                 <div class="form-group"><label>Nombre del Huésped</label><input type="text" id="input-name" required placeholder="Ej. Juan Pérez"></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Habitación</label><input type="text" id="input-room" required placeholder="Ej. Suite 302"></div>
+                    <div class="form-group"><label>Habitación</label><input type="text" id="input-room" required placeholder="Ej. 101"></div>
                     <div class="form-group"><label>Precio por Noche (Q)</label><input type="number" id="input-price" required></div>
                 </div>
                 <div class="form-row">
@@ -927,7 +1068,110 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
                 <div class="form-group"><label>Correo Electrónico</label><input type="email" id="input-email" required></div>
             `;
+        } else if (currentSection === "Habitaciones") {
+            modalFormFields.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group"><label>Número de Habitación</label><input type="text" id="input-room-number" required placeholder="Ej. 101"></div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="input-room-type" required>
+                            <option value="Doble">Doble</option>
+                            <option value="Triple">Triple</option>
+                            <option value="Cuádruple">Cuádruple</option>
+                            <option value="Quíntuple">Quíntuple</option>
+                            <option value="Semi">Semi</option>
+                            <option value="Dorm">Dorm</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Precio por Noche (Q)</label><input type="number" id="input-room-price" step="0.01" required></div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="input-room-status" required>
+                            <option value="Disponible">Disponible</option>
+                            <option value="Ocupada">Ocupada</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        } else if (currentSection === "Consumo") {
+            modalFormFields.innerHTML = `
+                <div class="form-group"><label>Número de Habitación</label><input type="text" id="input-consumption-room" required placeholder="Ej. 101"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Concepto / Producto</label><input type="text" id="input-consumption-item" required placeholder="Ej. Cerveza Gallo x6"></div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="input-consumption-category" required>
+                            <option value="Restaurante">Restaurante</option>
+                            <option value="Minibar">Minibar</option>
+                            <option value="Actividades">Actividades</option>
+                            <option value="Servicios">Servicios</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"><label>Monto (Q)</label><input type="number" id="input-consumption-amount" step="0.01" required></div>
+            `;
         }
+    }
+
+    // Lee los valores del formulario activo según la sección actual
+    function readFormData() {
+        if (currentSection === "Habitaciones") {
+            return {
+                number: document.getElementById("input-room-number")?.value || "",
+                type: document.getElementById("input-room-type")?.value || "Doble",
+                price: parseFloat(document.getElementById("input-room-price")?.value || 0),
+                status: document.getElementById("input-room-status")?.value || "Disponible",
+            };
+        }
+        if (currentSection === "Consumo") {
+            return {
+                room: document.getElementById("input-consumption-room")?.value || "",
+                item: document.getElementById("input-consumption-item")?.value || "",
+                category: document.getElementById("input-consumption-category")?.value || "Restaurante",
+                amount: parseFloat(document.getElementById("input-consumption-amount")?.value || 0),
+            };
+        }
+        // Reservaciones / Huespedes / Dashboard
+        return {
+            name: document.getElementById("input-name")?.value || "",
+            room: document.getElementById("input-room")?.value || "",
+            price: parseFloat(document.getElementById("input-price")?.value || 0),
+            checkin: document.getElementById("input-checkin")?.value || "",
+            checkout: document.getElementById("input-checkout")?.value || "",
+            channel: document.getElementById("input-channel")?.value || "direct",
+            phone: document.getElementById("input-phone")?.value || "",
+            email: document.getElementById("input-email")?.value || "",
+        };
+    }
+
+    // Rellena el formulario activo cuando se edita un registro existente
+    function fillFormForEdit(record) {
+        if (currentSection === "Habitaciones") {
+            if (document.getElementById("input-room-number")) document.getElementById("input-room-number").value = record.number || '';
+            if (document.getElementById("input-room-type")) document.getElementById("input-room-type").value = record.type || 'Doble';
+            if (document.getElementById("input-room-price")) document.getElementById("input-room-price").value = record.price || '';
+            if (document.getElementById("input-room-status")) document.getElementById("input-room-status").value = record.status || 'Disponible';
+            return;
+        }
+        if (currentSection === "Consumo") {
+            if (document.getElementById("input-consumption-room")) document.getElementById("input-consumption-room").value = record.room || '';
+            if (document.getElementById("input-consumption-item")) document.getElementById("input-consumption-item").value = record.item || '';
+            if (document.getElementById("input-consumption-category")) document.getElementById("input-consumption-category").value = record.category || 'Restaurante';
+            if (document.getElementById("input-consumption-amount")) document.getElementById("input-consumption-amount").value = record.amount || '';
+            return;
+        }
+        // Reservaciones / Huespedes / Dashboard
+        if (document.getElementById("input-name")) document.getElementById("input-name").value = record.name || '';
+        if (document.getElementById("input-room")) document.getElementById("input-room").value = record.room || '';
+        if (document.getElementById("input-price")) document.getElementById("input-price").value = record.price || '';
+        if (document.getElementById("input-checkin")) document.getElementById("input-checkin").value = record.checkin || '';
+        if (document.getElementById("input-checkout")) document.getElementById("input-checkout").value = record.checkout || '';
+        if (document.getElementById("input-channel")) document.getElementById("input-channel").value = record.channel || 'direct';
+        if (document.getElementById("input-phone")) document.getElementById("input-phone").value = record.phone || '';
+        if (document.getElementById("input-email")) document.getElementById("input-email").value = record.email || '';
     }
 
     function openModal(record = null) {
@@ -938,14 +1182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (record && modalTitle && recordIdInput) {
             modalTitle.textContent = `Editar Registro`;
             recordIdInput.value = record.id;
-            if (document.getElementById("input-name")) document.getElementById("input-name").value = record.name || '';
-            if (document.getElementById("input-room")) document.getElementById("input-room").value = record.room || '';
-            if (document.getElementById("input-price")) document.getElementById("input-price").value = record.price || '';
-            if (document.getElementById("input-checkin")) document.getElementById("input-checkin").value = record.checkin || '';
-            if (document.getElementById("input-checkout")) document.getElementById("input-checkout").value = record.checkout || '';
-            if (document.getElementById("input-channel")) document.getElementById("input-channel").value = record.channel || 'direct';
-            if (document.getElementById("input-phone")) document.getElementById("input-phone").value = record.phone || '';
-            if (document.getElementById("input-email")) document.getElementById("input-email").value = record.email || '';
+            fillFormForEdit(record);
         } else if (modalTitle && crudForm) {
             modalTitle.textContent = `Añadir Registro`;
             if (crudForm.reset) crudForm.reset();
@@ -960,13 +1197,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnCloseModal) btnCloseModal.addEventListener("click", closeModal);
     if (btnAddRecord) btnAddRecord.addEventListener("click", () => openModal());
 
+    function findRecordById(id) {
+        if (currentSection === "Habitaciones") return roomsData.find(r => r.id == id);
+        if (currentSection === "Consumo") return billingData.find(b => b.id == id);
+        return guestsData.find(g => g.id == id);
+    }
+
     function attachRowEventListeners() {
         document.querySelectorAll("#crud-table-body tr").forEach(row => {
             row.addEventListener("click", (e) => {
                 if (e.target.closest(".btn-icon")) return;
-                const guestId = row.getAttribute("data-guest-id");
-                if (guestId) {
-                    const guest = guestsData.find(g => g.id == guestId);
+                // El detalle ampliado solo aplica para huéspedes/reservaciones
+                if (currentSection === "Habitaciones" || currentSection === "Consumo") return;
+                const recordId = row.getAttribute("data-record-id");
+                if (recordId) {
+                    const guest = guestsData.find(g => g.id == recordId);
                     if (guest) openViewDetailModal(guest);
                 }
             });
@@ -975,9 +1220,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelectorAll(".edit-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 const id = btn.getAttribute("data-id");
-                let record = guestsData.find(g => g.id == id) || 
-                            roomsData.find(r => r.id == id) || 
-                            billingData.find(b => b.id == id);
+                const record = findRecordById(id);
                 if (record) openModal(record);
             });
         });
@@ -989,11 +1232,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const id = btn.getAttribute("data-id");
                 
                 try {
-                    // Intentar eliminar de Supabase
-                    await deleteReservationFromSupabase(id);
-                    // Recargar datos
+                    if (currentSection === "Habitaciones") {
+                        await deleteRoomFromSupabase(id);
+                    } else if (currentSection === "Consumo") {
+                        await deleteConsumptionFromSupabase(id);
+                    } else {
+                        await deleteReservationFromSupabase(id);
+                    }
                     await loadAllDataFromSupabase();
-                    // Renderizar
                     renderDynamicModule();
                 } catch (error) {
                     alert('Error al eliminar: ' + error.message);
@@ -1009,68 +1255,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (submitBtn && submitBtn.style.display === "none") return;
 
             const targetId = recordIdInput ? recordIdInput.value : null;
-            const dataObj = {
-                id: targetId ? targetId : Date.now().toString(),
-                name: document.getElementById("input-name")?.value || "",
-                room: document.getElementById("input-room")?.value || "",
-                price: parseFloat(document.getElementById("input-price")?.value || 0),
-                checkin: document.getElementById("input-checkin")?.value || "",
-                checkout: document.getElementById("input-checkout")?.value || "",
-                channel: document.getElementById("input-channel")?.value || "direct",
-                phone: document.getElementById("input-phone")?.value || "",
-                email: document.getElementById("input-email")?.value || "",
-            };
+            const dataObj = readFormData();
 
             try {
                 if (submitBtn) submitBtn.disabled = true;
                 submitBtn.textContent = 'Guardando...';
-                
-                if (!targetId) {
-                    // Nuevo registro - guardar en Supabase
-                    await saveReservationToSupabase(dataObj);
-                    // Recargar datos
-                    await loadAllDataFromSupabase();
-                } else {
+
+                if (currentSection === "Habitaciones") {
                     if (!targetId) {
-    // Nuevo registro - guardar en Supabase
-    await saveReservationToSupabase(dataObj);
-    await loadAllDataFromSupabase();
-} else {
-    // Actualizar en Supabase
-    const { error } = await supabaseClient
-        .from('reservations')
-        .update({
-            guest_name: dataObj.name,
-            guest_email: dataObj.email,
-            guest_phone: dataObj.phone,
-            check_in: dataObj.checkin,
-            check_out: dataObj.checkout,
-            total_amount: dataObj.price,
-            channel: dataObj.channel,
-        })
-        .eq('id', targetId)
-        .eq('property_id', currentPropertyId);
-
-    if (error) throw error;
-
-    const { data: room } = await supabaseClient
-        .from('rooms')
-        .select('id')
-        .eq('number', dataObj.room)
-        .eq('property_id', currentPropertyId)
-        .single();
-
-    if (room) {
-        await supabaseClient
-            .from('reservations')
-            .update({ room_id: room.id })
-            .eq('id', targetId);
-    }
-
-    await loadAllDataFromSupabase();
-}
+                        await saveRoomToSupabase(dataObj);
+                    } else {
+                        await updateRoomInSupabase(targetId, dataObj);
+                    }
+                } else if (currentSection === "Consumo") {
+                    if (!targetId) {
+                        await saveConsumptionToSupabase(dataObj);
+                    } else {
+                        await updateConsumptionInSupabase(targetId, dataObj);
+                    }
+                } else {
+                    // Reservaciones / Huespedes / Dashboard
+                    if (!targetId) {
+                        await saveReservationToSupabase(dataObj);
+                    } else {
+                        await updateReservationInSupabase(targetId, dataObj);
+                    }
                 }
 
+                await loadAllDataFromSupabase();
                 closeModal();
                 renderDynamicModule();
                 
