@@ -308,7 +308,7 @@ async function checkActiveSession() {
                 localStorage.setItem('user_role', userData.role);
             }
             
-            window.location.href = 'dashboard.html';
+            window.location.href = '../Dashboard/dashboard.html';
         }
     } catch (error) {
         console.log('No hay sesión activa');
