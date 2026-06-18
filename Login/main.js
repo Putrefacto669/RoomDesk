@@ -524,7 +524,7 @@ function showLoginSuccess(userData) {
     
     // Redirigir al dashboard
     setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = '../Dashboard/dashboard.html';
     }, 800);
 }
 
