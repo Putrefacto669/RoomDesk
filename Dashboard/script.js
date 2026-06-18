@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             if (!session) {
                 localStorage.clear();
-                window.location.href = "login.html";
+                window.location.href = "../Login/index.html";
                 return false;
             }
             
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
             console.error('Error de sesión:', error);
             localStorage.clear();
-            window.location.href = "login.html";
+            window.location.href = "../Login/index.html";
             return false;
         }
     }
