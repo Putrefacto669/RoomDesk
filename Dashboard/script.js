@@ -504,7 +504,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             console.log("Enviando petición a Python...");
             
-            const response = await fetch('http://localhost:5000/api/generate-pdf', {
+            const response = await fetch('https://roomdesk.onrender.com/api/generate-pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
