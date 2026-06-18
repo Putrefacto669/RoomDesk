@@ -41,6 +41,18 @@ def after_request(response):
 DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 VALID_REPORT_TYPES = {"reservations", "occupancy", "guests", "revenue", "consumptions"}
 
+# Etiquetas en español para mostrar en el PDF, según el status que guarda Supabase
+STATUS_LABELS = {
+    "pending": "Pendiente",
+    "confirmed": "Confirmada",
+    "cancelled": "Cancelada",
+}
+
+def status_label(raw_status: str) -> str:
+    """Traduce el status interno (pending/confirmed/cancelled) a una etiqueta en español para el PDF."""
+    key = str(raw_status or "").strip().lower()
+    return STATUS_LABELS.get(key, raw_status or "Pendiente")
+
 # ─── Paleta de colores y estilos ─────────────────────────────────────────────
 
 PRIMARY      = colors.HexColor("#1E2A5E")   
@@ -211,7 +223,7 @@ class PDFGenerator:
         max_v = max(values) if values else 1
         for bar in bars:
             h = bar.get_height()
-            label = f"${h:,.0f}" if "monto" in y_key.lower() else f"{h:,.0f}"
+            label = f"Q{h:,.0f}" if "monto" in y_key.lower() else f"{h:,.0f}"
             ax.text(bar.get_x() + bar.get_width() / 2, h + max_v * 0.018, label, ha="center", va="bottom", fontsize=8.5, color="#2C3E50", fontweight="bold")
 
         ax.set_title(title, fontsize=13, fontweight="bold", color="#1E2A5E", pad=14)
@@ -307,7 +319,13 @@ class PDFGenerator:
         header_row = [Paragraph(str(h).replace("_", " ").title(), ParagraphStyle("th", fontName="Helvetica-Bold", fontSize=9, textColor=WHITE, alignment=TA_CENTER)) for h in headers]
         rows = [header_row]
         for row in data:
-            cells = [Paragraph(str(row.get(key, "—")), ParagraphStyle("td", fontName="Helvetica", fontSize=8.5, textColor=TEXT_DARK, alignment=TA_CENTER, leading=12)) for key in headers]
+            cells = []
+            for key in headers:
+                value = row.get(key, "—")
+                # Si la columna es de estado, mostramos la etiqueta traducida en vez del valor crudo (pending/confirmed/cancelled)
+                if key == "status":
+                    value = status_label(value)
+                cells.append(Paragraph(str(value), ParagraphStyle("td", fontName="Helvetica", fontSize=8.5, textColor=TEXT_DARK, alignment=TA_CENTER, leading=12)))
             rows.append(cells)
 
         table = Table(rows, colWidths=col_widths, repeatRows=1)
@@ -338,9 +356,11 @@ class PDFGenerator:
     def _build_reservations(self, data: list) -> list:
         story = []
         total = len(data)
-        pendientes = sum(1 for d in data if str(d.get("status", "")).lower() in ("pendiente", "pending"))
-        confirmadas = sum(1 for d in data if str(d.get("status", "")).lower() in ("confirmada", "activa", "active"))
-        canceladas  = sum(1 for d in data if str(d.get("status", "")).lower() in ("cancelada", "cancelled"))
+        # Reconoce los valores reales que guarda Supabase (pending/confirmed/cancelled)
+        # y también variantes en español por si se reciben de otra fuente.
+        pendientes = sum(1 for d in data if str(d.get("status", "")).strip().lower() in ("pendiente", "pending", ""))
+        confirmadas = sum(1 for d in data if str(d.get("status", "")).strip().lower() in ("confirmada", "confirmed", "activa", "active"))
+        canceladas  = sum(1 for d in data if str(d.get("status", "")).strip().lower() in ("cancelada", "cancelled", "canceled"))
 
         kpis = [
             {"value": total,       "label": "Total Reservas",    "color": PRIMARY},
@@ -355,7 +375,7 @@ class PDFGenerator:
         if data and any("status" in d for d in data):
             status_count = {}
             for d in data:
-                s = str(d.get("status", "Desconocido"))
+                s = status_label(d.get("status", ""))
                 status_count[s] = status_count.get(s, 0) + 1
             chart_data = [{"estado": k, "cantidad": v} for k, v in status_count.items()]
             chart_path = self.chart_bars(chart_data, "estado", "cantidad", "Reservas por Estado", "Cantidad")
@@ -447,7 +467,7 @@ class PDFGenerator:
 
         kpis = [
             {"value": total, "label": "Total Consumos", "color": PRIMARY},
-            {"value": f"${total_consumido:,.2f}" if monto_key else "—", "label": "Monto Total Consumido", "color": ACCENT},
+            {"value": f"Q{total_consumido:,.2f}" if monto_key else "—", "label": "Monto Total Consumido", "color": ACCENT},
         ]
         story += self._section_header("Resumen de Consumos")
         story.append(self._kpi_table(kpis))
