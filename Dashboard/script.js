@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 channel: res.channel,
                 email: res.guest_email,
                 phone: res.guest_phone || 'No registrado',
-                status: res.status
+                status: res.status || 'pending'
             }));
 
             const activeReservations = (data || []).filter(r => r.status === 'confirmed').length;
@@ -420,8 +420,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         switch(reportType) {
             case 'reservations':
                 title = 'Reporte de Reservaciones';
-                headers = ['Huésped', 'Habitación', 'Check-In', 'Check-Out', 'Monto'];
-                data = guestsReservationsData.map(g => [g.name, g.room, g.checkin, g.checkout, `Q${g.price}`]);
+                headers = ['Huésped', 'Habitación', 'Check-In', 'Check-Out', 'Monto', 'Estado'];
+                data = guestsReservationsData.map(g => [g.name, g.room, g.checkin, g.checkout, `Q${g.price}`, renderStatusBadge(g.status)]);
                 break;
             case 'occupancy': {
                 title = 'Reporte de Ocupación';
@@ -488,7 +488,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     name: g.name, room: g.room,
                     checkin: g.checkin, checkout: g.checkout,
                     monto: g.price, channel: g.channel,
-                    email: g.email, phone: g.phone
+                    email: g.email, phone: g.phone, status: g.status
                 }));
                 break;
             case 'guests':
@@ -604,6 +604,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (dataBoxTitle) dataBoxTitle.style.display = 'block';
     }
 
+    // Traduce el status interno a una etiqueta visual con color
+    function renderStatusBadge(status) {
+        const labels = { pending: 'Pendiente', confirmed: 'Confirmada', cancelled: 'Cancelada' };
+        const styles = {
+            pending: 'background:rgba(255,159,10,0.15); color:#ff9f0a;',
+            confirmed: 'background:rgba(42,255,92,0.15); color:#1acc3c;',
+            cancelled: 'background:rgba(255,55,95,0.15); color:#ff375f;'
+        };
+        const label = labels[status] || 'Pendiente';
+        const style = styles[status] || styles.pending;
+        return `<span class="badge-channel" style="${style} border:none; font-weight:700;">${label}</span>`;
+    }
+
     // ==========================================
     // 11. CRUD: RESERVACIONES (tabla reservations)
     // ==========================================
@@ -634,7 +647,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 check_out: reservationData.checkout,
                 total_amount: reservationData.price,
                 channel: reservationData.channel,
-                status: 'confirmed'
+                status: 'pending'
             })
             .select()
             .single();
@@ -658,6 +671,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             check_out: dataObj.checkout,
             total_amount: dataObj.price,
             channel: dataObj.channel,
+            status: dataObj.status,
         };
 
         if (guest) {
@@ -922,6 +936,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <th>Check-In / Out</th>
                         <th>Precio</th>
                         <th>Canal</th>
+                        <th>Estado</th>
                         <th>Contacto</th>
                         <th>Acciones</th>
                     </tr>
@@ -936,6 +951,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>In: ${guest.checkin}<span class="cell-subtext">Out: ${guest.checkout}</span></td>
                         <td><strong>Q${guest.price}</strong>/Noche</td>
                         <td><span class="badge-channel" style="background:rgba(10,132,255,0.12);">${guest.channel}</span></td>
+                        <td>${renderStatusBadge(guest.status)}</td>
                         <td>${guest.email}<span class="cell-subtext">${guest.phone}</span></td>
                         <td>
                             <div class="action-buttons">
@@ -1100,6 +1116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="detail-item"><label>Fecha Check-In</label><p>${record.checkin}</p></div>
                     <div class="detail-item"><label>Fecha Check-Out</label><p>${record.checkout}</p></div>
                     <div class="detail-item"><label>Canal de Reserva</label><p>${record.channel}</p></div>
+                    <div class="detail-item"><label>Estado</label><p>${renderStatusBadge(record.status)}</p></div>
                     <div class="detail-item"><label>Teléfono Movil</label><p>${record.phone}</p></div>
                     <div class="detail-item detail-full"><label>Email de Contacto</label><p>${record.email}</p></div>
                 </div>
@@ -1147,14 +1164,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="form-group"><label>Check-In</label><input type="date" id="input-checkin" required></div>
                     <div class="form-group"><label>Check-Out</label><input type="date" id="input-checkout" required></div>
                 </div>
-                <div class="form-group">
-                    <label>Canal</label>
-                    <select id="input-channel" required>
-                        <option value="Booking.com">Booking.com</option>
-                        <option value="Airbnb">Airbnb</option>
-                        <option value="Directo Web">Directo Web</option>
-                        <option value="direct">Directo</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Canal</label>
+                        <select id="input-channel" required>
+                            <option value="Booking.com">Booking.com</option>
+                            <option value="Airbnb">Airbnb</option>
+                            <option value="Directo Web">Directo Web</option>
+                            <option value="direct">Directo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de la Reserva</label>
+                        <select id="input-status" required>
+                            <option value="pending">Pendiente</option>
+                            <option value="confirmed">Confirmada</option>
+                            <option value="cancelled">Cancelada</option>
+                        </select>
+                    </div>
                 </div>
             `;
 
@@ -1262,6 +1289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             checkin: document.getElementById("input-checkin")?.value || "",
             checkout: document.getElementById("input-checkout")?.value || "",
             channel: document.getElementById("input-channel")?.value || "direct",
+            status: document.getElementById("input-status")?.value || "pending",
         };
     }
 
@@ -1294,6 +1322,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (document.getElementById("input-checkin")) document.getElementById("input-checkin").value = record.checkin || '';
         if (document.getElementById("input-checkout")) document.getElementById("input-checkout").value = record.checkout || '';
         if (document.getElementById("input-channel")) document.getElementById("input-channel").value = record.channel || 'direct';
+        if (document.getElementById("input-status")) document.getElementById("input-status").value = record.status || 'pending';
     }
 
     function openModal(record = null) {
