@@ -675,15 +675,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.style.display = 'block';
     }
 
+   // ============================================================
+    // 13. REPORTES — generateAndSaveReport con fallback offline
+    // ============================================================
     async function generateAndSaveReport() {
-        if (!navigator.onLine) { alert('⚠️ La generación de PDFs requiere conexión a internet.'); return; }
         const type = document.getElementById('report-type').value;
         const from = document.getElementById('report-date-from').value;
         const to   = document.getElementById('report-date-to').value;
         const btn  = document.getElementById('btn-generate-pdf');
         const orig = btn.innerHTML;
+
+        // Sin internet → PDF local con jsPDF
+        if (!navigator.onLine) {
+            await generateOfflinePDF(type, from, to);
+            return;
+        }
+
         btn.innerHTML = '⏳ Generando PDF...';
         btn.disabled  = true;
+
         const dataMap = {
             reservations: guestsReservationsData.map(g=>({name:g.name,room:g.room,checkin:g.checkin,checkout:g.checkout,monto:g.price,channel:g.channel,email:g.email,phone:g.phone,status:g.status})),
             guests:       guestsData.map(g=>({name:g.name,email:g.email,phone:g.phone})),
@@ -691,155 +701,221 @@ document.addEventListener('DOMContentLoaded', async () => {
             revenue:      guestsReservationsData.map(g=>({name:g.name,monto:g.price})),
             consumptions: billingData.map(b=>({item:b.item,category:b.category,monto:b.amount,date:b.date}))
         };
+
         try {
-            const res = await fetch('https://roomdesk.onrender.com/api/generate-pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({report_type:type,data:dataMap[type]||[],fecha_inicio:from,fecha_fin:to}) });
-            if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error(e?.error||`HTTP ${res.status}`); }
+            const res = await fetch('https://roomdesk.onrender.com/api/generate-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ report_type: type, data: dataMap[type] || [], fecha_inicio: from, fecha_fin: to })
+            });
+            if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error(e?.error || `HTTP ${res.status}`); }
             const blob = await res.blob();
             if (blob.type !== 'application/pdf') throw new Error('El servidor no devolvió un PDF válido.');
             const url = window.URL.createObjectURL(blob);
-            const a   = Object.assign(document.createElement('a'),{style:'display:none',href:url,download:`reporte_${type}_${Date.now()}.pdf`});
+            const a   = Object.assign(document.createElement('a'), { style:'display:none', href:url, download:`reporte_${type}_${Date.now()}.pdf` });
             document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
-            const names = {reservations:'Reservaciones',occupancy:'Ocupación',guests:'Huéspedes',revenue:'Ingresos',consumptions:'Consumos'};
-            saveReportToLocal({id:Date.now(),name:`reporte_${type}`,type:names[type]||type,date:new Date().toLocaleString(),size:`${Math.round(blob.size/1024)} KB`});
+            const names = { reservations:'Reservaciones', occupancy:'Ocupación', guests:'Huéspedes', revenue:'Ingresos', consumptions:'Consumos' };
+            saveReportToLocal({ id:Date.now(), name:`reporte_${type}`, type:names[type]||type, date:new Date().toLocaleString(), size:`${Math.round(blob.size/1024)} KB` });
             alert('✅ PDF generado y descargado exitosamente');
         } catch (err) {
             console.error('Error reporte:', err);
-            alert(`❌ Error al generar el reporte:\n${err.message}`);
+            // Si la red falla aunque onLine=true (ej. Render dormido), cae a jsPDF
+            if (err.message.includes('fetch') || err.message.includes('Failed') || err.message.includes('network')) {
+                console.warn('[Offline] Servidor no disponible, generando PDF local...');
+                await generateOfflinePDF(type, from, to);
+            } else {
+                alert(`❌ Error al generar el reporte:\n${err.message}`);
+            }
         } finally {
             btn.innerHTML = orig;
             btn.disabled  = false;
         }
     }
 
-    function mostrarModuloReportes() {
-        const s = document.getElementById('reports-section');
-        if (s)                   s.style.display                   = 'block';
-        if (dashboardCardsSection) dashboardCardsSection.style.display = 'none';
-        if (crudActionsPanel)    crudActionsPanel.style.display    = 'none';
-        if (crudTableContainer)  crudTableContainer.style.display  = 'none';
-        if (mainDataBox)         mainDataBox.style.display         = 'none';
-        const today   = new Date().toISOString().split('T')[0];
-        const ago30   = new Date(Date.now()-30*24*60*60*1000).toISOString().split('T')[0];
-        const fi = document.getElementById('report-date-from');
-        const ti = document.getElementById('report-date-to');
-        if (fi && !fi.value) fi.value = ago30;
-        if (ti && !ti.value) ti.value = today;
-        renderReportsList();
-    }
-
-    function ocultarModuloReportes() {
-        const s = document.getElementById('reports-section');
-        if (s) s.style.display = 'none';
-        if (mainDataBox)  mainDataBox.style.display  = 'flex';
-        if (dataBoxTitle) dataBoxTitle.style.display = 'block';
-        if (currentSection !== 'Dashboard' && dashboardCardsSection) dashboardCardsSection.style.display = 'none';
-    }
-
     // ============================================================
-    // 14. RENDER DINÁMICO
+    // PDF OFFLINE — 100% en el navegador con jsPDF
     // ============================================================
-    function editBtn(id)   { return `<button class="btn-icon edit-btn"   data-id="${id}" aria-label="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>`; }
-    function deleteBtn(id) { return `<button class="btn-icon delete delete-btn" data-id="${id}" aria-label="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>`; }
+    async function generateOfflinePDF(type, from, to) {
+        const btn  = document.getElementById('btn-generate-pdf');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '⏳ Generando PDF offline...';
+        btn.disabled  = true;
 
-    function emptyRow(cols, msg) { return `<tr class="row-empty"><td colspan="${cols}" style="text-align:center; color:var(--text-sub); padding:32px;">${msg}</td></tr>`; }
-
-    function renderDynamicModule() {
-        if (!tableBody || !crudTableHead) return;
-        tableBody.innerHTML = '';
-        crudTableHead.innerHTML = '';
-        ocultarModuloReportes();
-
-        if (currentSection === 'Dashboard') {
-            if (crudTitle)    crudTitle.textContent    = `Bienvenido de nuevo, ${savedUser}`;
-            if (crudSubtitle) crudSubtitle.textContent = 'Resumen de ocupación para hoy.';
-            if (dataBoxTitle) dataBoxTitle.textContent = 'Check-ins / Check-outs de hoy (datos en vivo)';
-            if (dashboardCardsSection) dashboardCardsSection.style.display = 'grid';
-            if (crudActionsPanel)      crudActionsPanel.style.display      = 'none';
-            if (dashboardPlaceholder)  dashboardPlaceholder.style.display  = 'none';
-            if (crudTableContainer)    crudTableContainer.style.display    = 'block';
-            crudTableHead.innerHTML = '<tr><th>Huésped</th><th>Habitación</th><th>Estado de Tránsito</th><th>Canal</th><th>Detalles</th></tr>';
-            const today = new Date().toISOString().split('T')[0];
-            if (guestsReservationsData.length === 0) {
-                tableBody.innerHTML = emptyRow(5, 'No hay reservaciones para hoy.');
-            } else {
-                guestsReservationsData.forEach(g => {
-                    let badge = '';
-                    if      (g.checkin  === today) badge = `<span class="badge-channel" style="background:rgba(26,204,60,0.15); color:var(--success-color); border:none;">➡ Entrada Hoy</span>`;
-                    else if (g.checkout === today) badge = `<span class="badge-channel" style="background:rgba(255,55,95,0.15);  color:var(--danger-color);  border:none;">⬅ Salida Hoy</span>`;
-                    else                           badge = `<span class="badge-channel" style="color:var(--text-sub);">En Curso</span>`;
-                    const tr = document.createElement('tr');
-                    tr.setAttribute('data-record-id', g.id);
-                    tr.innerHTML = `<td><strong>${g.name}</strong>${g._offline?'<span class="offline-indicator" title="Pendiente de sincronizar"> ⏳</span>':''}</td><td><span class="badge-channel" style="font-weight:700;">${g.room}</span></td><td>${badge}</td><td><span class="badge-channel" style="background:rgba(10,132,255,0.12);">${g.channel}</span></td><td style="color:var(--text-sub); font-size:12px;">Click para ver ficha</td>`;
-                    tableBody.appendChild(tr);
-                });
+        try {
+            if (typeof window.jspdf === 'undefined') {
+                alert('⚠️ La librería de PDF no está en caché todavía.\nAbre RoomDesk con internet al menos una vez para habilitarla offline.');
+                return;
             }
-            attachRowEventListeners();
-            return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            const PAGE_W   = 210;
+            const MARGIN   = 14;
+            const COL_W    = PAGE_W - MARGIN * 2;
+            const ROW_H    = 8;
+            const HEADER_H = 10;
+            const names    = { reservations:'Reservaciones', occupancy:'Ocupación', guests:'Huéspedes', revenue:'Ingresos', consumptions:'Consumos' };
+
+            let y = MARGIN;
+
+            // Encabezado azul
+            doc.setFillColor(10, 132, 255);
+            doc.roundedRect(MARGIN, y, COL_W, 14, 3, 3, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+            doc.text('RoomDesk', MARGIN + 4, y + 9.5);
+            doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+            doc.text('by Kawoq', PAGE_W - MARGIN - 4, y + 9.5, { align: 'right' });
+            y += 20;
+
+            // Título
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+            doc.text(`Reporte de ${names[type] || type}`, MARGIN, y);
+            y += 7;
+
+            // Metadata
+            doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
+            doc.text(`Generado: ${new Date().toLocaleString('es-GT')}`, MARGIN, y);
+            if (from) doc.text(`Período: ${from} → ${to || 'actual'}`, PAGE_W - MARGIN, y, { align: 'right' });
+            doc.setDrawColor(220, 220, 220);
+            doc.line(MARGIN, y + 3, PAGE_W - MARGIN, y + 3);
+            y += 10;
+
+            // Datos por tipo
+            let headers = [], rows = [], colWidths = [];
+
+            switch (type) {
+                case 'reservations':
+                    headers   = ['Huésped', 'Hab.', 'Check-In', 'Check-Out', 'Monto', 'Estado', 'Canal'];
+                    colWidths = [40, 14, 22, 22, 18, 22, 24];
+                    rows      = guestsReservationsData.map(g => [truncatePDF(g.name,18), g.room, g.checkin, g.checkout, `Q${g.price}`, statusLabelPDF(g.status), truncatePDF(g.channel,12)]);
+                    break;
+                case 'guests':
+                    headers   = ['Nombre', 'Correo Electrónico', 'Teléfono'];
+                    colWidths = [55, 80, 47];
+                    rows      = guestsData.map(g => [truncatePDF(g.name,22), truncatePDF(g.email,32), g.phone || '—']);
+                    break;
+                case 'occupancy': {
+                    const total = roomsData.length, occ = roomsData.filter(r=>r.status==='Ocupada').length;
+                    drawSummaryBoxPDF(doc, MARGIN, y, COL_W, [
+                        { label:'Total habitaciones', value: String(total) },
+                        { label:'Ocupadas',           value: String(occ) },
+                        { label:'Disponibles',        value: String(total - occ) },
+                        { label:'Ocupación',          value: total ? `${((occ/total)*100).toFixed(1)}%` : '0%' }
+                    ]);
+                    y += 28;
+                    headers   = ['Habitación', 'Tipo', 'Precio/Noche', 'Estado'];
+                    colWidths = [28, 40, 34, 30];
+                    rows      = roomsData.map(r => [r.number, r.type, `Q${r.price}`, r.status]);
+                    break;
+                }
+                case 'revenue': {
+                    const total = guestsReservationsData.reduce((s,g)=>s+g.price, 0);
+                    drawSummaryBoxPDF(doc, MARGIN, y, COL_W, [
+                        { label:'Total ingresos', value:`Q${total.toFixed(2)}` },
+                        { label:'Reservaciones',  value: String(guestsReservationsData.length) }
+                    ]);
+                    y += 20;
+                    headers   = ['Huésped', 'Habitación', 'Check-In', 'Check-Out', 'Monto'];
+                    colWidths = [48, 18, 24, 24, 24];
+                    rows      = guestsReservationsData.map(g => [truncatePDF(g.name,20), g.room, g.checkin, g.checkout, `Q${g.price}`]);
+                    break;
+                }
+                case 'consumptions':
+                    headers   = ['Habitación', 'Concepto', 'Categoría', 'Fecha', 'Monto'];
+                    colWidths = [22, 58, 28, 22, 22];
+                    rows      = billingData.map(b => [b.room||'—', truncatePDF(b.item,26), b.category, b.date, `Q${b.amount}`]);
+                    break;
+            }
+
+            if (headers.length > 0) drawTablePDF(doc, headers, rows, colWidths, MARGIN, y, PAGE_W, MARGIN, ROW_H, HEADER_H);
+
+            // Footer en cada página
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7); doc.setTextColor(170, 170, 170);
+                doc.text(`RoomDesk by Kawoq · Página ${i} de ${totalPages}`, PAGE_W / 2, 292, { align: 'center' });
+            }
+
+            const filename = `reporte_${type}_${Date.now()}.pdf`;
+            doc.save(filename);
+
+            saveReportToLocal({ id:Date.now(), name:`reporte_${type}`, type:names[type]||type, date:new Date().toLocaleString(), size:'— KB', note:'(offline)' });
+            alert('✅ PDF generado offline y descargado correctamente');
+
+        } catch (err) {
+            console.error('Error PDF offline:', err);
+            alert(`❌ Error al generar el PDF:\n${err.message}`);
+        } finally {
+            btn.innerHTML = orig;
+            btn.disabled  = false;
         }
-
-        if (dashboardCardsSection) dashboardCardsSection.style.display = 'none';
-        if (dashboardPlaceholder)  dashboardPlaceholder.style.display  = 'none';
-        if (crudTableContainer)    crudTableContainer.style.display    = 'block';
-        if (crudTitle)    crudTitle.textContent    = currentSection;
-        if (dataBoxTitle) dataBoxTitle.textContent = `Registros en Módulo ${currentSection}`;
-
-        switch (currentSection) {
-            case 'Reservaciones':
-                if (crudSubtitle)     crudSubtitle.textContent       = 'Habitación, fechas, precio y canal.';
-                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
-                crudTableHead.innerHTML = '<tr><th>Huésped</th><th>Habitación</th><th>Check-In / Out</th><th>Precio</th><th>Canal</th><th>Estado</th><th>Contacto</th><th>Acciones</th></tr>';
-                if (guestsReservationsData.length === 0) { tableBody.innerHTML = emptyRow(8, 'No hay reservaciones.'); break; }
-                guestsReservationsData.forEach(g => {
-                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', g.id);
-                    tr.innerHTML = `<td><strong>${g.name}</strong>${g._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td><span class="badge-channel" style="font-weight:700;">${g.room}</span></td><td>In: ${g.checkin}<span class="cell-subtext">Out: ${g.checkout}</span></td><td><strong>Q${g.price}</strong>/Noche</td><td><span class="badge-channel" style="background:rgba(10,132,255,0.12);">${g.channel}</span></td><td>${renderStatusBadge(g.status)}</td><td>${g.email}<span class="cell-subtext">${g.phone}</span></td><td><div class="action-buttons">${editBtn(g.id)}${deleteBtn(g.id)}</div></td>`;
-                    tableBody.appendChild(tr);
-                });
-                break;
-
-            case 'Huéspedes':
-                if (crudSubtitle)     crudSubtitle.textContent       = 'Registro de nombre, correo y teléfono.';
-                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
-                crudTableHead.innerHTML = '<tr><th>Nombre</th><th>Correo Electrónico</th><th>Teléfono</th><th>Acciones</th></tr>';
-                if (guestsData.length === 0) { tableBody.innerHTML = emptyRow(4, 'No hay huéspedes registrados.'); break; }
-                guestsData.forEach(g => {
-                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', g.id);
-                    tr.innerHTML = `<td><strong>${g.name}</strong>${g._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td>${g.email}</td><td>${g.phone||'—'}</td><td><div class="action-buttons">${editBtn(g.id)}${deleteBtn(g.id)}</div></td>`;
-                    tableBody.appendChild(tr);
-                });
-                break;
-
-            case 'Habitaciones':
-                if (crudSubtitle)     crudSubtitle.textContent       = 'Inventario, tarifas y disponibilidad.';
-                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
-                crudTableHead.innerHTML = '<tr><th>Nº Habitación</th><th>Tipología</th><th>Precio Base</th><th>Estado Actual</th><th>Acciones</th></tr>';
-                if (roomsData.length === 0) { tableBody.innerHTML = emptyRow(5, 'No hay habitaciones registradas.'); break; }
-                roomsData.forEach(r => {
-                    const ss = { 'Disponible':'background:rgba(26,204,60,0.15); color:var(--success-color);', 'Ocupada':'background:rgba(10,132,255,0.15); color:#0a84ff;', 'Mantenimiento':'background:rgba(255,55,95,0.15); color:var(--danger-color);' };
-                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', r.id);
-                    tr.innerHTML = `<td><strong>${r.number}</strong>${r._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td>${r.type}</td><td><strong>Q${r.price}</strong>/Noche</td><td><span class="badge-channel" style="${ss[r.status]||ss['Disponible']} border:none;">${r.status}</span></td><td><div class="action-buttons">${editBtn(r.id)}${deleteBtn(r.id)}</div></td>`;
-                    tableBody.appendChild(tr);
-                });
-                break;
-
-            case 'Consumo':
-                if (crudSubtitle)     crudSubtitle.textContent       = 'Gastos adicionales y minibar.';
-                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
-                crudTableHead.innerHTML = '<tr><th>Habitación</th><th>Concepto</th><th>Categoría</th><th>Fecha</th><th>Importe</th><th>Acciones</th></tr>';
-                if (billingData.length === 0) { tableBody.innerHTML = emptyRow(6, 'No hay consumos registrados.'); break; }
-                billingData.forEach(item => {
-                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', item.id);
-                    tr.innerHTML = `<td><strong>${item.room||'—'}</strong></td><td>${item.item}${item._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td><span class="badge-channel">${item.category}</span></td><td>${item.date}</td><td><strong style="color:var(--success-color);">Q${item.amount.toFixed(2)}</strong></td><td><div class="action-buttons">${editBtn(item.id)}${deleteBtn(item.id)}</div></td>`;
-                    tableBody.appendChild(tr);
-                });
-                break;
-
-            case 'Reportes':
-                if (crudSubtitle) crudSubtitle.textContent = 'Genera y gestiona reportes personalizados';
-                mostrarModuloReportes();
-                break;
-        }
-        attachRowEventListeners();
     }
+
+    // Helpers del PDF (con sufijo PDF para no colisionar con otras funciones)
+    function truncatePDF(str, max) {
+        if (!str) return '—';
+        return str.length > max ? str.substring(0, max - 1) + '…' : str;
+    }
+
+    function statusLabelPDF(s) {
+        return { pending:'Pendiente', confirmed:'Confirmada', cancelled:'Cancelada' }[s] || 'Pendiente';
+    }
+
+    function drawSummaryBoxPDF(doc, x, y, w, items) {
+        const boxH  = 18;
+        const itemW = w / items.length;
+        doc.setFillColor(245, 247, 250);
+        doc.roundedRect(x, y, w, boxH, 2, 2, 'F');
+        items.forEach((item, i) => {
+            const cx = x + itemW * i + itemW / 2;
+            doc.setFontSize(7);  doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
+            doc.text(item.label, cx, y + 7, { align: 'center' });
+            doc.setFontSize(13); doc.setFont('helvetica', 'bold');   doc.setTextColor(10, 132, 255);
+            doc.text(item.value, cx, y + 15, { align: 'center' });
+        });
+    }
+
+    function drawTablePDF(doc, headers, rows, colWidths, ml, startY, pageW, pm, rowH, headerH) {
+        let y = startY;
+        // Cabecera
+        doc.setFillColor(30, 30, 30);
+        doc.rect(ml, y, pageW - ml * 2, headerH, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+        let x = ml;
+        headers.forEach((h, i) => { doc.text(h, x + 2, y + 7); x += colWidths[i]; });
+        y += headerH;
+
+        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+        rows.forEach((row, ri) => {
+            if (y + rowH > 282) {
+                doc.addPage(); y = pm;
+                doc.setFillColor(30, 30, 30);
+                doc.rect(ml, y, pageW - ml * 2, headerH, 'F');
+                doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+                let hx = ml;
+                headers.forEach((h, i) => { doc.text(h, hx + 2, y + 7); hx += colWidths[i]; });
+                y += headerH;
+                doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+            }
+            if (ri % 2 === 0) { doc.setFillColor(250, 250, 252); doc.rect(ml, y, pageW - ml * 2, rowH, 'F'); }
+            doc.setTextColor(40, 40, 40);
+            let cx = ml;
+            row.forEach((cell, i) => { doc.text(String(cell ?? '—'), cx + 2, y + 5.5); cx += colWidths[i]; });
+            doc.setDrawColor(230, 230, 230);
+            doc.line(ml, y + rowH, pageW - ml, y + rowH);
+            y += rowH;
+        });
+        if (rows.length === 0) {
+            doc.setTextColor(160, 160, 160); doc.setFontSize(9);
+            doc.text('No hay datos para este período.', pageW / 2, y + 8, { align: 'center' });
+        }
+    }
+
+    function mostrarModuloReportes() {
 
     // ============================================================
     // 15. MODALES Y CRUD
