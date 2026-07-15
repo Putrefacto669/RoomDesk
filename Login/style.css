@@ -27,6 +27,9 @@
   
   --error-color: #ff375f;
   --error-glow: rgba(255, 55, 95, 0.3);
+
+  --input-line: rgba(255, 255, 255, 0.14);
+  --input-line-focus: var(--accent-blue);
 }
 
 /* ==========================================================================
@@ -58,6 +61,9 @@ body.light-mode {
   
   --error-color: #ff375f;
   --error-glow: rgba(255, 55, 95, 0.25);
+
+  --input-line: rgba(0, 0, 0, 0.2);
+  --input-line-focus: var(--accent-blue);
 }
 
 /* ==========================================================================
@@ -428,8 +434,28 @@ form .svgContainer .armR {
    INPUT GROUPS & CAMPOS DE TEXTO
    ========================================================================== */
 form .inputGroup {
-  margin-bottom: 1.6em;
+  margin-bottom: 2.2em;
   position: relative;
+}
+
+/* Línea animada de acento al hacer focus */
+form .inputGroup::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+}
+
+form .inputGroup:focus-within::after {
+  transform: scaleX(1);
 }
 
 form .inputGroup:last-of-type {
@@ -454,21 +480,22 @@ form .inputGroup:focus-within label {
 form input[type='text'], 
 form input[type='password'] {
   display: block;
-  padding: 22px 1.1em 0px;
-  background-color: var(--input-bg);
-  border: 1.5px solid var(--glass-border);
-  border-radius: 16px;
+  padding: 16px 4px 12px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--input-line);
+  border-radius: 0;
   width: 100%;
-  height: 66px;
+  height: auto;
   font-size: 1.1rem;
-  line-height: 1.2;
+  line-height: 1.4;
   color: var(--text-main);
   font-weight: 500;
   font-family: inherit;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s, color 0.25s;
+  transition: border-color 0.3s ease, color 0.25s;
 }
 
 form input::placeholder {
@@ -483,9 +510,9 @@ form input:focus::placeholder {
 
 form input[type='text']:focus, 
 form input[type='password']:focus {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px var(--accent-glow), 0 0 18px var(--accent-glow);
+  background-color: transparent;
+  border-bottom-color: var(--accent-blue);
+  box-shadow: none;
 }
 
 form input[type='text']:focus-visible, 
@@ -495,15 +522,15 @@ form input[type='password']:focus-visible {
 
 body.light-mode form input[type='text']:focus, 
 body.light-mode form input[type='password']:focus {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 
 /* ==========================================================================
    ESTADOS DE ERROR EN INPUTS
    ========================================================================== */
 form input.error {
-  border-color: var(--error-color);
-  box-shadow: 0 0 14px var(--error-glow);
+  border-bottom-color: var(--error-color);
+  box-shadow: none;
 }
 
 form .inputGroup .error-message {
@@ -542,21 +569,21 @@ form .inputGroup1 .helper {
 }
 
 form .inputGroup1 .helper1 {
-  top: 22px;
-  left: 1.1em;
+  top: 16px;
+  left: 4px;
   color: var(--text-sub);
   font-size: 1.1rem;
   font-weight: 400;
   opacity: 0.5;
   transform-origin: top left;
-  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
-              opacity 0.2s ease, 
-              color 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+              opacity 0.25s ease, 
+              color 0.25s ease;
 }
 
 form .inputGroup1.focusWithText .helper1 {
-  transform: translateY(-11px) scale(0.68);
-  opacity: 0.85;
+  transform: translateY(-22px) scale(0.72);
+  opacity: 0.9;
   color: var(--accent-blue);
 }
 
