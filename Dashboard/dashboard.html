@@ -30,12 +30,10 @@
 
             <nav class="liquid-nav" id="nav" aria-label="Navegación principal">
 
-                <!-- Efecto de brillo dinámico por mouse -->
                 <div class="liquid-glare-container" aria-hidden="true">
                     <div class="liquid-glare" id="glare"></div>
                 </div>
 
-                <!-- Botones de navegación -->
                 <div class="nav-items">
                     <div class="active-pill" id="active-pill" aria-hidden="true"></div>
 
@@ -115,10 +113,8 @@
                     </button>
                 </div>
 
-                <!-- Separador -->
                 <div class="divider" role="separator"></div>
 
-                <!-- Toggle de tema -->
                 <button class="theme-btn" id="theme-btn" aria-label="Cambiar entre modo claro y oscuro">
                     <div class="theme-icon-wrapper" aria-hidden="true">
                         <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -138,10 +134,8 @@
                     </div>
                 </button>
 
-                <!-- Separador -->
                 <div class="divider" role="separator"></div>
 
-                <!-- Perfil de usuario -->
                 <div class="user-profile">
                     <div class="avatar-wrapper" aria-hidden="true">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -155,10 +149,8 @@
                     </div>
                 </div>
 
-                <!-- Separador -->
                 <div class="divider" role="separator"></div>
 
-                <!-- Botón de cerrar sesión — dentro del nav donde pertenece -->
                 <button id="logout-btn" class="logout-button" aria-label="Cerrar sesión">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -177,11 +169,19 @@
         <main class="main-content">
 
             <header class="main-header">
-                <h1 id="crud-title">Bienvenido de nuevo, oasistraveler</h1>
-                <p id="crud-subtitle">Aquí tienes el resumen del día.</p>
+                <div class="header-top">
+                    <div>
+                        <h1 id="crud-title">Bienvenido de nuevo, oasistraveler</h1>
+                        <p id="crud-subtitle">Aquí tienes el resumen del día.</p>
+                    </div>
+                    <!-- Badge de estado offline — oculto por defecto, JS lo muestra -->
+                    <div id="offline-badge" class="offline-badge" role="status" aria-live="polite" style="display:none;">
+                        <span class="offline-dot" aria-hidden="true"></span>
+                        <span id="offline-text">Sin conexión</span>
+                    </div>
+                </div>
             </header>
 
-            <!-- Panel de acciones CRUD (visible solo en módulos con tabla) -->
             <div class="crud-actions" id="crud-actions-panel" style="display: none;">
                 <button class="btn-primary" id="btn-add-record">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
@@ -192,7 +192,6 @@
                 </button>
             </div>
 
-            <!-- KPI Cards del Dashboard -->
             <section class="dashboard-cards" id="dashboard-cards-section" aria-label="Resumen de métricas">
                 <div class="card">
                     <h3>Reservaciones Activas</h3>
@@ -208,9 +207,6 @@
                 </div>
             </section>
 
-            <!-- ================================================
-                 SECCIÓN DE REPORTES
-                 ================================================ -->
             <section id="reports-section" style="display: none;" aria-label="Generador de reportes">
                 <div class="reports-container">
                     <div class="reports-header">
@@ -229,17 +225,14 @@
                                 <option value="consumptions">Consumos</option>
                             </select>
                         </div>
-
                         <div class="date-range-group">
                             <label for="report-date-from">Desde</label>
                             <input type="date" id="report-date-from">
                         </div>
-
                         <div class="date-range-group">
                             <label for="report-date-to">Hasta</label>
                             <input type="date" id="report-date-to">
                         </div>
-
                         <div class="report-actions">
                             <button id="btn-generate-pdf" class="btn-primary">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -251,35 +244,27 @@
                                 </svg>
                                 Generar PDF
                             </button>
-                            <button id="btn-preview-report" class="btn-secondary">
-                                Vista Previa
-                            </button>
+                            <button id="btn-preview-report" class="btn-secondary">Vista Previa</button>
                         </div>
                     </div>
 
-                    <!-- Vista previa del reporte -->
                     <div class="report-preview" id="report-preview" style="display: none;">
                         <h4>Vista Previa</h4>
                         <div id="preview-content"></div>
                     </div>
 
-                    <!-- Lista de reportes generados -->
                     <div class="saved-reports">
                         <h4>Reportes Generados</h4>
                         <div class="table-responsive">
                             <table class="crud-table" id="reports-table">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Tipo</th>
-                                        <th>Fecha</th>
-                                        <th>Tamaño</th>
-                                        <th>Acciones</th>
+                                        <th>Nombre</th><th>Tipo</th><th>Fecha</th><th>Tamaño</th><th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="reports-table-body">
-                                    <tr>
-                                        <td colspan="5" style="text-align: center;">No hay reportes generados</td>
+                                    <tr class="row-empty">
+                                        <td colspan="5" style="text-align:center;">No hay reportes generados</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -288,19 +273,12 @@
                 </div>
             </section>
 
-            <!-- ================================================
-                 TABLA DINÁMICA PRINCIPAL (CRUD)
-                 ================================================ -->
             <section class="content-data">
                 <div class="data-box" id="main-data-box">
                     <h3 id="data-box-title">Actividad Reciente</h3>
-
-                    <!-- Estado vacío -->
                     <div class="placeholder-content" id="dashboard-placeholder">
                         <p>No hay eventos recientes pendientes.</p>
                     </div>
-
-                    <!-- Tabla de datos -->
                     <div class="table-responsive" id="crud-table-container" style="display: none;">
                         <table class="crud-table">
                             <thead id="crud-table-head"></thead>
@@ -313,9 +291,7 @@
         </main>
     </div>
 
-    <!-- ================================================
-         MODAL CRUD
-         ================================================ -->
+    <!-- Modal CRUD -->
     <div class="modal-overlay" id="crud-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-card">
             <div class="modal-header">
@@ -332,8 +308,37 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db-offline.js"></script>
     <script src="script.js"></script>
-</body>
 
+    <!-- Registro del Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    // El sw.js está en la raíz del sitio (un nivel arriba de /Dashboard/)
+                    const registration = await navigator.serviceWorker.register('../sw.js', {
+                        scope: '/'
+                    });
+                    console.log('[SW] Registrado con scope:', registration.scope);
+
+                    // Si hay una versión nueva del SW esperando, notifica al usuario
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[SW] Nueva versión disponible');
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.warn('[SW] No se pudo registrar:', error.message);
+                }
+            });
+        }
+    </script>
+
+</body>
 </html>
