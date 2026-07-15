@@ -428,7 +428,7 @@ form .svgContainer .armR {
    INPUT GROUPS & CAMPOS DE TEXTO
    ========================================================================== */
 form .inputGroup {
-  margin-bottom: 1.4em;
+  margin-bottom: 1.6em;
   position: relative;
 }
 
@@ -437,13 +437,13 @@ form .inputGroup:last-of-type {
 }
 
 form label {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--text-sub);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.9px;
   transition: color 0.25s ease;
 }
 
@@ -454,13 +454,13 @@ form .inputGroup:focus-within label {
 form input[type='text'], 
 form input[type='password'] {
   display: block;
-  padding: 18px 1em 0px;
+  padding: 22px 1.1em 0px;
   background-color: var(--input-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
+  border: 1.5px solid var(--glass-border);
+  border-radius: 16px;
   width: 100%;
-  height: 58px;
-  font-size: 1.15rem;
+  height: 66px;
+  font-size: 1.1rem;
   line-height: 1.2;
   color: var(--text-main);
   font-weight: 500;
@@ -483,9 +483,9 @@ form input:focus::placeholder {
 
 form input[type='text']:focus, 
 form input[type='password']:focus {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.03);
   border-color: var(--accent-blue);
-  box-shadow: 0 0 14px var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 0 18px var(--accent-glow);
 }
 
 form input[type='text']:focus-visible, 
@@ -542,8 +542,8 @@ form .inputGroup1 .helper {
 }
 
 form .inputGroup1 .helper1 {
-  top: 18px;
-  left: 1em;
+  top: 22px;
+  left: 1.1em;
   color: var(--text-sub);
   font-size: 1.1rem;
   font-weight: 400;
@@ -555,8 +555,8 @@ form .inputGroup1 .helper1 {
 }
 
 form .inputGroup1.focusWithText .helper1 {
-  transform: translateY(-9px) scale(0.72);
-  opacity: 0.8;
+  transform: translateY(-11px) scale(0.68);
+  opacity: 0.85;
   color: var(--accent-blue);
 }
 
@@ -578,25 +578,25 @@ form .inputGroup1.focusWithText .helper1 {
 form button {
   display: block;
   width: 100%;
-  height: 52px;
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 14px;
+  height: 58px;
+  background: var(--accent-blue);
+  border: none;
+  border-radius: 16px;
   font-size: 1.05rem;
-  color: var(--btn-text);
+  color: #ffffff;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: background 0.25s, color 0.25s, transform 0.1s, border-color 0.25s;
+  box-shadow: 0 4px 20px var(--accent-glow);
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
   -webkit-appearance: none;
   appearance: none;
+  letter-spacing: 0.2px;
 }
 
 form button:hover {
-  background: var(--btn-hover-bg);
-  color: var(--btn-hover-text);
-  border-color: var(--btn-hover-bg);
+  background: color-mix(in srgb, var(--accent-blue) 85%, #fff);
+  box-shadow: 0 6px 24px var(--accent-glow);
 }
 
 form button:active {
