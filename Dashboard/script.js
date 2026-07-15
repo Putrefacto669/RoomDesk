@@ -675,8 +675,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.style.display = 'block';
     }
 
-   // ============================================================
-    // 13. REPORTES — generateAndSaveReport con fallback offline
+    // ============================================================
+    // 13. REPORTES — con fallback offline via jsPDF
     // ============================================================
     async function generateAndSaveReport() {
         const type = document.getElementById('report-type').value;
@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================================
-    // PDF OFFLINE — 100% en el navegador con jsPDF
+    // PDF OFFLINE — generado 100% en el navegador con jsPDF
     // ============================================================
     async function generateOfflinePDF(type, from, to) {
         const btn  = document.getElementById('btn-generate-pdf');
@@ -783,14 +783,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             doc.line(MARGIN, y + 3, PAGE_W - MARGIN, y + 3);
             y += 10;
 
-            // Datos por tipo
+            // Datos según tipo de reporte
             let headers = [], rows = [], colWidths = [];
 
             switch (type) {
                 case 'reservations':
                     headers   = ['Huésped', 'Hab.', 'Check-In', 'Check-Out', 'Monto', 'Estado', 'Canal'];
                     colWidths = [40, 14, 22, 22, 18, 22, 24];
-                    rows      = guestsReservationsData.map(g => [truncatePDF(g.name,18), g.room, g.checkin, g.checkout, `Q${g.price}`, statusLabelPDF(g.status), truncatePDF(g.channel,12)]);
+                    rows      = guestsReservationsData.map(g => [
+                        truncatePDF(g.name,18), g.room, g.checkin, g.checkout,
+                        `Q${g.price}`, statusLabelPDF(g.status), truncatePDF(g.channel,12)
+                    ]);
                     break;
                 case 'guests':
                     headers   = ['Nombre', 'Correo Electrónico', 'Teléfono'];
@@ -798,7 +801,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     rows      = guestsData.map(g => [truncatePDF(g.name,22), truncatePDF(g.email,32), g.phone || '—']);
                     break;
                 case 'occupancy': {
-                    const total = roomsData.length, occ = roomsData.filter(r=>r.status==='Ocupada').length;
+                    const total = roomsData.length;
+                    const occ   = roomsData.filter(r => r.status === 'Ocupada').length;
                     drawSummaryBoxPDF(doc, MARGIN, y, COL_W, [
                         { label:'Total habitaciones', value: String(total) },
                         { label:'Ocupadas',           value: String(occ) },
@@ -812,7 +816,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     break;
                 }
                 case 'revenue': {
-                    const total = guestsReservationsData.reduce((s,g)=>s+g.price, 0);
+                    const total = guestsReservationsData.reduce((s, g) => s + g.price, 0);
                     drawSummaryBoxPDF(doc, MARGIN, y, COL_W, [
                         { label:'Total ingresos', value:`Q${total.toFixed(2)}` },
                         { label:'Reservaciones',  value: String(guestsReservationsData.length) }
@@ -830,7 +834,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     break;
             }
 
-            if (headers.length > 0) drawTablePDF(doc, headers, rows, colWidths, MARGIN, y, PAGE_W, MARGIN, ROW_H, HEADER_H);
+            if (headers.length > 0) {
+                drawTablePDF(doc, headers, rows, colWidths, MARGIN, y, PAGE_W, MARGIN, ROW_H, HEADER_H);
+            }
 
             // Footer en cada página
             const totalPages = doc.internal.getNumberOfPages();
@@ -840,10 +846,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 doc.text(`RoomDesk by Kawoq · Página ${i} de ${totalPages}`, PAGE_W / 2, 292, { align: 'center' });
             }
 
-            const filename = `reporte_${type}_${Date.now()}.pdf`;
-            doc.save(filename);
+            doc.save(`reporte_${type}_${Date.now()}.pdf`);
 
-            saveReportToLocal({ id:Date.now(), name:`reporte_${type}`, type:names[type]||type, date:new Date().toLocaleString(), size:'— KB', note:'(offline)' });
+            saveReportToLocal({
+                id:   Date.now(),
+                name: `reporte_${type}`,
+                type: names[type] || type,
+                date: new Date().toLocaleString(),
+                size: '— KB',
+                note: '(offline)'
+            });
             alert('✅ PDF generado offline y descargado correctamente');
 
         } catch (err) {
@@ -855,7 +867,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Helpers del PDF (con sufijo PDF para no colisionar con otras funciones)
+    // Helpers internos del PDF
     function truncatePDF(str, max) {
         if (!str) return '—';
         return str.length > max ? str.substring(0, max - 1) + '…' : str;
@@ -873,7 +885,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         items.forEach((item, i) => {
             const cx = x + itemW * i + itemW / 2;
             doc.setFontSize(7);  doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
-            doc.text(item.label, cx, y + 7, { align: 'center' });
+            doc.text(item.label, cx, y + 7,  { align: 'center' });
             doc.setFontSize(13); doc.setFont('helvetica', 'bold');   doc.setTextColor(10, 132, 255);
             doc.text(item.value, cx, y + 15, { align: 'center' });
         });
@@ -881,7 +893,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function drawTablePDF(doc, headers, rows, colWidths, ml, startY, pageW, pm, rowH, headerH) {
         let y = startY;
-        // Cabecera
+        // Cabecera oscura
         doc.setFillColor(30, 30, 30);
         doc.rect(ml, y, pageW - ml * 2, headerH, 'F');
         doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
@@ -891,6 +903,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
         rows.forEach((row, ri) => {
+            // Salto de página automático
             if (y + rowH > 282) {
                 doc.addPage(); y = pm;
                 doc.setFillColor(30, 30, 30);
@@ -901,6 +914,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 y += headerH;
                 doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
             }
+            // Fondo alternado
             if (ri % 2 === 0) { doc.setFillColor(250, 250, 252); doc.rect(ml, y, pageW - ml * 2, rowH, 'F'); }
             doc.setTextColor(40, 40, 40);
             let cx = ml;
@@ -916,6 +930,134 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function mostrarModuloReportes() {
+        const s = document.getElementById('reports-section');
+        if (s)                   s.style.display                   = 'block';
+        if (dashboardCardsSection) dashboardCardsSection.style.display = 'none';
+        if (crudActionsPanel)    crudActionsPanel.style.display    = 'none';
+        if (crudTableContainer)  crudTableContainer.style.display  = 'none';
+        if (mainDataBox)         mainDataBox.style.display         = 'none';
+        const today   = new Date().toISOString().split('T')[0];
+        const ago30   = new Date(Date.now()-30*24*60*60*1000).toISOString().split('T')[0];
+        const fi = document.getElementById('report-date-from');
+        const ti = document.getElementById('report-date-to');
+        if (fi && !fi.value) fi.value = ago30;
+        if (ti && !ti.value) ti.value = today;
+        renderReportsList();
+    }
+
+    function ocultarModuloReportes() {
+        const s = document.getElementById('reports-section');
+        if (s) s.style.display = 'none';
+        if (mainDataBox)  mainDataBox.style.display  = 'flex';
+        if (dataBoxTitle) dataBoxTitle.style.display = 'block';
+        if (currentSection !== 'Dashboard' && dashboardCardsSection) dashboardCardsSection.style.display = 'none';
+    }
+
+    // ============================================================
+    // 14. RENDER DINÁMICO
+    // ============================================================
+    function editBtn(id)   { return `<button class="btn-icon edit-btn"   data-id="${id}" aria-label="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>`; }
+    function deleteBtn(id) { return `<button class="btn-icon delete delete-btn" data-id="${id}" aria-label="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>`; }
+
+    function emptyRow(cols, msg) { return `<tr class="row-empty"><td colspan="${cols}" style="text-align:center; color:var(--text-sub); padding:32px;">${msg}</td></tr>`; }
+
+    function renderDynamicModule() {
+        if (!tableBody || !crudTableHead) return;
+        tableBody.innerHTML = '';
+        crudTableHead.innerHTML = '';
+        ocultarModuloReportes();
+
+        if (currentSection === 'Dashboard') {
+            if (crudTitle)    crudTitle.textContent    = `Bienvenido de nuevo, ${savedUser}`;
+            if (crudSubtitle) crudSubtitle.textContent = 'Resumen de ocupación para hoy.';
+            if (dataBoxTitle) dataBoxTitle.textContent = 'Check-ins / Check-outs de hoy (datos en vivo)';
+            if (dashboardCardsSection) dashboardCardsSection.style.display = 'grid';
+            if (crudActionsPanel)      crudActionsPanel.style.display      = 'none';
+            if (dashboardPlaceholder)  dashboardPlaceholder.style.display  = 'none';
+            if (crudTableContainer)    crudTableContainer.style.display    = 'block';
+            crudTableHead.innerHTML = '<tr><th>Huésped</th><th>Habitación</th><th>Estado de Tránsito</th><th>Canal</th><th>Detalles</th></tr>';
+            const today = new Date().toISOString().split('T')[0];
+            if (guestsReservationsData.length === 0) {
+                tableBody.innerHTML = emptyRow(5, 'No hay reservaciones para hoy.');
+            } else {
+                guestsReservationsData.forEach(g => {
+                    let badge = '';
+                    if      (g.checkin  === today) badge = `<span class="badge-channel" style="background:rgba(26,204,60,0.15); color:var(--success-color); border:none;">➡ Entrada Hoy</span>`;
+                    else if (g.checkout === today) badge = `<span class="badge-channel" style="background:rgba(255,55,95,0.15);  color:var(--danger-color);  border:none;">⬅ Salida Hoy</span>`;
+                    else                           badge = `<span class="badge-channel" style="color:var(--text-sub);">En Curso</span>`;
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-record-id', g.id);
+                    tr.innerHTML = `<td><strong>${g.name}</strong>${g._offline?'<span class="offline-indicator" title="Pendiente de sincronizar"> ⏳</span>':''}</td><td><span class="badge-channel" style="font-weight:700;">${g.room}</span></td><td>${badge}</td><td><span class="badge-channel" style="background:rgba(10,132,255,0.12);">${g.channel}</span></td><td style="color:var(--text-sub); font-size:12px;">Click para ver ficha</td>`;
+                    tableBody.appendChild(tr);
+                });
+            }
+            attachRowEventListeners();
+            return;
+        }
+
+        if (dashboardCardsSection) dashboardCardsSection.style.display = 'none';
+        if (dashboardPlaceholder)  dashboardPlaceholder.style.display  = 'none';
+        if (crudTableContainer)    crudTableContainer.style.display    = 'block';
+        if (crudTitle)    crudTitle.textContent    = currentSection;
+        if (dataBoxTitle) dataBoxTitle.textContent = `Registros en Módulo ${currentSection}`;
+
+        switch (currentSection) {
+            case 'Reservaciones':
+                if (crudSubtitle)     crudSubtitle.textContent       = 'Habitación, fechas, precio y canal.';
+                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
+                crudTableHead.innerHTML = '<tr><th>Huésped</th><th>Habitación</th><th>Check-In / Out</th><th>Precio</th><th>Canal</th><th>Estado</th><th>Contacto</th><th>Acciones</th></tr>';
+                if (guestsReservationsData.length === 0) { tableBody.innerHTML = emptyRow(8, 'No hay reservaciones.'); break; }
+                guestsReservationsData.forEach(g => {
+                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', g.id);
+                    tr.innerHTML = `<td><strong>${g.name}</strong>${g._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td><span class="badge-channel" style="font-weight:700;">${g.room}</span></td><td>In: ${g.checkin}<span class="cell-subtext">Out: ${g.checkout}</span></td><td><strong>Q${g.price}</strong>/Noche</td><td><span class="badge-channel" style="background:rgba(10,132,255,0.12);">${g.channel}</span></td><td>${renderStatusBadge(g.status)}</td><td>${g.email}<span class="cell-subtext">${g.phone}</span></td><td><div class="action-buttons">${editBtn(g.id)}${deleteBtn(g.id)}</div></td>`;
+                    tableBody.appendChild(tr);
+                });
+                break;
+
+            case 'Huéspedes':
+                if (crudSubtitle)     crudSubtitle.textContent       = 'Registro de nombre, correo y teléfono.';
+                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
+                crudTableHead.innerHTML = '<tr><th>Nombre</th><th>Correo Electrónico</th><th>Teléfono</th><th>Acciones</th></tr>';
+                if (guestsData.length === 0) { tableBody.innerHTML = emptyRow(4, 'No hay huéspedes registrados.'); break; }
+                guestsData.forEach(g => {
+                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', g.id);
+                    tr.innerHTML = `<td><strong>${g.name}</strong>${g._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td>${g.email}</td><td>${g.phone||'—'}</td><td><div class="action-buttons">${editBtn(g.id)}${deleteBtn(g.id)}</div></td>`;
+                    tableBody.appendChild(tr);
+                });
+                break;
+
+            case 'Habitaciones':
+                if (crudSubtitle)     crudSubtitle.textContent       = 'Inventario, tarifas y disponibilidad.';
+                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
+                crudTableHead.innerHTML = '<tr><th>Nº Habitación</th><th>Tipología</th><th>Precio Base</th><th>Estado Actual</th><th>Acciones</th></tr>';
+                if (roomsData.length === 0) { tableBody.innerHTML = emptyRow(5, 'No hay habitaciones registradas.'); break; }
+                roomsData.forEach(r => {
+                    const ss = { 'Disponible':'background:rgba(26,204,60,0.15); color:var(--success-color);', 'Ocupada':'background:rgba(10,132,255,0.15); color:#0a84ff;', 'Mantenimiento':'background:rgba(255,55,95,0.15); color:var(--danger-color);' };
+                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', r.id);
+                    tr.innerHTML = `<td><strong>${r.number}</strong>${r._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td>${r.type}</td><td><strong>Q${r.price}</strong>/Noche</td><td><span class="badge-channel" style="${ss[r.status]||ss['Disponible']} border:none;">${r.status}</span></td><td><div class="action-buttons">${editBtn(r.id)}${deleteBtn(r.id)}</div></td>`;
+                    tableBody.appendChild(tr);
+                });
+                break;
+
+            case 'Consumo':
+                if (crudSubtitle)     crudSubtitle.textContent       = 'Gastos adicionales y minibar.';
+                if (crudActionsPanel) crudActionsPanel.style.display = 'flex';
+                crudTableHead.innerHTML = '<tr><th>Habitación</th><th>Concepto</th><th>Categoría</th><th>Fecha</th><th>Importe</th><th>Acciones</th></tr>';
+                if (billingData.length === 0) { tableBody.innerHTML = emptyRow(6, 'No hay consumos registrados.'); break; }
+                billingData.forEach(item => {
+                    const tr = document.createElement('tr'); tr.setAttribute('data-record-id', item.id);
+                    tr.innerHTML = `<td><strong>${item.room||'—'}</strong></td><td>${item.item}${item._offline?'<span title="Pendiente de sync"> ⏳</span>':''}</td><td><span class="badge-channel">${item.category}</span></td><td>${item.date}</td><td><strong style="color:var(--success-color);">Q${item.amount.toFixed(2)}</strong></td><td><div class="action-buttons">${editBtn(item.id)}${deleteBtn(item.id)}</div></td>`;
+                    tableBody.appendChild(tr);
+                });
+                break;
+
+            case 'Reportes':
+                if (crudSubtitle) crudSubtitle.textContent = 'Genera y gestiona reportes personalizados';
+                mostrarModuloReportes();
+                break;
+        }
+        attachRowEventListeners();
+    }
 
     // ============================================================
     // 15. MODALES Y CRUD
