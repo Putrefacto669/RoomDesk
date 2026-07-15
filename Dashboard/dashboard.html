@@ -1,38 +1,47 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="es" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoomDesk</title>
+    <meta name="description" content="RoomDesk — Panel de administración hotelera. Gestiona reservaciones, huéspedes y habitaciones desde un solo lugar.">
+    <title>RoomDesk — Dashboard</title>
     <link rel="stylesheet" href="dashboardstyle.css">
 </head>
 
 <body>
-    <div class="bg-mesh">
+
+    <!-- Fondo con blobs animados -->
+    <div class="bg-mesh" aria-hidden="true">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
     <div class="dashboard-container">
-        
+
+        <!-- ================================================
+             SIDEBAR
+             ================================================ -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>RoomDesk</h2>
             </div>
-            
-            <nav class="liquid-nav" id="nav">
-                <div class="liquid-glare-container">
+
+            <nav class="liquid-nav" id="nav" aria-label="Navegación principal">
+
+                <!-- Efecto de brillo dinámico por mouse -->
+                <div class="liquid-glare-container" aria-hidden="true">
                     <div class="liquid-glare" id="glare"></div>
                 </div>
 
+                <!-- Botones de navegación -->
                 <div class="nav-items">
-                    <div class="active-pill" id="active-pill"></div>
+                    <div class="active-pill" id="active-pill" aria-hidden="true"></div>
 
-                    <button class="nav-btn active">
+                    <button class="nav-btn active" aria-current="page">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
@@ -42,7 +51,7 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                             </svg>
                             <span>Reservaciones</span>
@@ -51,7 +60,7 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <line x1="8" y1="6" x2="21" y2="6"></line>
                                 <line x1="8" y1="12" x2="21" y2="12"></line>
                                 <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -59,22 +68,25 @@
                                 <line x1="3" y1="12" x2="3.01" y2="12"></line>
                                 <line x1="3" y1="18" x2="3.01" y2="18"></line>
                             </svg>
-                            <span>Huespedes</span>
+                            <span>Huéspedes</span>
                         </div>
                     </button>
-                    
+
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="3" x2="9" y2="21"></line>
+                            </svg>
                             <span>Habitaciones</span>
                         </div>
                     </button>
 
-                    <div class="menu-section-divider"></div>
+                    <div class="menu-section-divider" role="separator"></div>
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <line x1="18" y1="20" x2="18" y2="10"></line>
                                 <line x1="12" y1="20" x2="12" y2="4"></line>
                                 <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -85,7 +97,7 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                             </svg>
                             <span>Consumo</span>
@@ -94,7 +106,7 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
                                 <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
                             </svg>
@@ -103,9 +115,12 @@
                     </button>
                 </div>
 
-                <div class="divider"></div>
-                <button class="theme-btn" id="theme-btn" aria-label="Dark Mode Toggle">
-                    <div class="theme-icon-wrapper">
+                <!-- Separador -->
+                <div class="divider" role="separator"></div>
+
+                <!-- Toggle de tema -->
+                <button class="theme-btn" id="theme-btn" aria-label="Cambiar entre modo claro y oscuro">
+                    <div class="theme-icon-wrapper" aria-hidden="true">
                         <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -123,9 +138,12 @@
                     </div>
                 </button>
 
-                <div class="divider"></div>
+                <!-- Separador -->
+                <div class="divider" role="separator"></div>
+
+                <!-- Perfil de usuario -->
                 <div class="user-profile">
-                    <div class="avatar-wrapper">
+                    <div class="avatar-wrapper" aria-hidden="true">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
@@ -136,164 +154,184 @@
                         <span class="user-role">Administrador</span>
                     </div>
                 </div>
+
+                <!-- Separador -->
+                <div class="divider" role="separator"></div>
+
+                <!-- Botón de cerrar sesión — dentro del nav donde pertenece -->
+                <button id="logout-btn" class="logout-button" aria-label="Cerrar sesión">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Cerrar Sesión</span>
+                </button>
+
             </nav>
         </aside>
-        <button id="logout-btn" class="logout-button">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-        <polyline points="16 17 21 12 16 7"></polyline>
-        <line x1="21" y1="12" x2="9" y2="12"></line>
-    </svg>
-    Cerrar Sesión
-</button>
 
+        <!-- ================================================
+             CONTENIDO PRINCIPAL
+             ================================================ -->
         <main class="main-content">
+
             <header class="main-header">
                 <h1 id="crud-title">Bienvenido de nuevo, oasistraveler</h1>
-                <p id="crud-subtitle">Aqui tienes el resumen del dia.</p>
+                <p id="crud-subtitle">Aquí tienes el resumen del día.</p>
             </header>
 
+            <!-- Panel de acciones CRUD (visible solo en módulos con tabla) -->
             <div class="crud-actions" id="crud-actions-panel" style="display: none;">
                 <button class="btn-primary" id="btn-add-record">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
                     Añadir Registro
                 </button>
             </div>
 
-            <section class="dashboard-cards" id="dashboard-cards-section">
+            <!-- KPI Cards del Dashboard -->
+            <section class="dashboard-cards" id="dashboard-cards-section" aria-label="Resumen de métricas">
                 <div class="card">
                     <h3>Reservaciones Activas</h3>
-                    <p class="card-number">42</p>
+                    <p class="card-number" aria-live="polite">—</p>
                 </div>
                 <div class="card">
                     <h3>Huéspedes Totales</h3>
-                    <p class="card-number">128</p>
+                    <p class="card-number" aria-live="polite">—</p>
                 </div>
                 <div class="card">
                     <h3>Habitaciones Libres</h3>
-                    <p class="card-number">15</p>
+                    <p class="card-number" aria-live="polite">—</p>
                 </div>
             </section>
-            <!-- ========================================== -->
-<!-- SECCIÓN DE REPORTES (NUEVA) -->
-<!-- ========================================== -->
-<section id="reports-section" style="display: none;">
-    <div class="reports-container">
-        <div class="reports-header">
-            <h3>Generador de Reportes</h3>
-            <p>Selecciona el tipo de reporte y el período</p>
-        </div>
 
-        <div class="report-controls">
-            <div class="report-type-group">
-                <label>Tipo de Reporte</label>
-                <select id="report-type">
-                    <option value="reservations">📋 Reporte de Reservaciones</option>
-                    <option value="occupancy">🏨 Reporte de Ocupación</option>
-                    <option value="guests">👥 Reporte de Huéspedes</option>
-                    <option value="revenue">💰 Reporte de Ingresos</option>
-                    <option value="consumptions">🍽️ Reporte de Consumos</option>
-                </select>
-            </div>
+            <!-- ================================================
+                 SECCIÓN DE REPORTES
+                 ================================================ -->
+            <section id="reports-section" style="display: none;" aria-label="Generador de reportes">
+                <div class="reports-container">
+                    <div class="reports-header">
+                        <h3>Generador de Reportes</h3>
+                        <p>Selecciona el tipo de reporte y el período</p>
+                    </div>
 
-            <div class="date-range-group">
-                <label>Desde</label>
-                <input type="date" id="report-date-from">
-            </div>
+                    <div class="report-controls">
+                        <div class="report-type-group">
+                            <label for="report-type">Tipo de Reporte</label>
+                            <select id="report-type">
+                                <option value="reservations">Reservaciones</option>
+                                <option value="occupancy">Ocupación</option>
+                                <option value="guests">Huéspedes</option>
+                                <option value="revenue">Ingresos</option>
+                                <option value="consumptions">Consumos</option>
+                            </select>
+                        </div>
 
-            <div class="date-range-group">
-                <label>Hasta</label>
-                <input type="date" id="report-date-to">
-            </div>
+                        <div class="date-range-group">
+                            <label for="report-date-from">Desde</label>
+                            <input type="date" id="report-date-from">
+                        </div>
 
-            <div class="report-actions">
-                <button id="btn-generate-pdf" class="btn-primary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                    Generar PDF
-                </button>
-                <button id="btn-preview-report" class="btn-secondary">
-                    Vista Previa
-                </button>
-            </div>
-        </div>
+                        <div class="date-range-group">
+                            <label for="report-date-to">Hasta</label>
+                            <input type="date" id="report-date-to">
+                        </div>
 
-        <!-- Vista previa del reporte -->
-        <div class="report-preview" id="report-preview" style="display: none;">
-            <h4>Vista Previa</h4>
-            <div id="preview-content"></div>
-        </div>
+                        <div class="report-actions">
+                            <button id="btn-generate-pdf" class="btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                                Generar PDF
+                            </button>
+                            <button id="btn-preview-report" class="btn-secondary">
+                                Vista Previa
+                            </button>
+                        </div>
+                    </div>
 
-        <!-- Lista de reportes guardados -->
-        <div class="saved-reports">
-            <h4>Reportes Generados</h4>
-            <div class="table-responsive">
-                <table class="crud-table" id="reports-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Tipo</th>
-                            <th>Fecha</th>
-                            <th>Tamaño</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reports-table-body">
-                        <tr>
-                            <td colspan="5" style="text-align: center;">No hay reportes generados</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</section>
+                    <!-- Vista previa del reporte -->
+                    <div class="report-preview" id="report-preview" style="display: none;">
+                        <h4>Vista Previa</h4>
+                        <div id="preview-content"></div>
+                    </div>
 
+                    <!-- Lista de reportes generados -->
+                    <div class="saved-reports">
+                        <h4>Reportes Generados</h4>
+                        <div class="table-responsive">
+                            <table class="crud-table" id="reports-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Tamaño</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reports-table-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center;">No hay reportes generados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================================
+                 TABLA DINÁMICA PRINCIPAL (CRUD)
+                 ================================================ -->
             <section class="content-data">
                 <div class="data-box" id="main-data-box">
                     <h3 id="data-box-title">Actividad Reciente</h3>
-                    
+
+                    <!-- Estado vacío -->
                     <div class="placeholder-content" id="dashboard-placeholder">
                         <p>No hay eventos recientes pendientes.</p>
                     </div>
 
+                    <!-- Tabla de datos -->
                     <div class="table-responsive" id="crud-table-container" style="display: none;">
                         <table class="crud-table">
-                            <thead id="crud-table-head">
-                                </thead>
-                            <tbody id="crud-table-body">
-                                </tbody>
+                            <thead id="crud-table-head"></thead>
+                            <tbody id="crud-table-body"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
-        </main>
 
+        </main>
     </div>
 
-    <div class="modal-overlay" id="crud-modal">
+    <!-- ================================================
+         MODAL CRUD
+         ================================================ -->
+    <div class="modal-overlay" id="crud-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-card">
             <div class="modal-header">
                 <h3 id="modal-title">Gestión de Registro</h3>
-                <button class="btn-close-modal" id="btn-close-modal">&times;</button>
+                <button class="btn-close-modal" id="btn-close-modal" aria-label="Cerrar">&times;</button>
             </div>
-            <form id="crud-form" class="modal-form">
+            <form id="crud-form" class="modal-form" novalidate>
                 <input type="hidden" id="record-id">
-                
-                <div id="modal-form-fields">
-                    </div>
-
+                <div id="modal-form-fields"></div>
                 <div class="modal-footer">
                     <button type="submit" class="btn-primary" id="btn-submit-form">Guardar Cambios</button>
                 </div>
             </form>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
