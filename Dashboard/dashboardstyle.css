@@ -4,10 +4,10 @@
 :root {
     /* Fondo & Ambient Light Blobs */
     --bg-color: #e5e5ea;
-    --blob-1: #2aff5c;
-    --blob-2: #00fbff;
+    --blob-1: #34c759;
+    --blob-2: #5ac8fa;
     --blob-3: #bd1b56;
-    --blob-opacity: 0.6;
+    --blob-opacity: 0.35;
 
     /* Cristal Líquido (Liquid Glass) - Modo Claro */
     --glass-bg: rgba(255, 255, 255, 0.2);
@@ -22,9 +22,9 @@
     --pill-bg: rgba(255, 255, 255, 0.75);
     --pill-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9);
     --icon-color: rgba(0, 0, 0, 0.45);
-    --icon-active: #007aff; 
+    --icon-active: #007aff;
     --divider: rgba(0, 0, 0, 0.08);
-    
+
     /* Componentes del Dashboard */
     --card-bg: rgba(255, 255, 255, 0.45);
     --input-bg: rgba(255, 255, 255, 0.4);
@@ -33,7 +33,7 @@
     --success-color: #1acc3c;
     --danger-color: #ff375f;
     --warning-color: #ff9f0a;
-    
+
     --nav-height: 44px;
 }
 
@@ -58,9 +58,9 @@
     --pill-bg: rgba(255, 255, 255, 0.12);
     --pill-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0px rgba(255, 255, 255, 0.05);
     --icon-color: rgba(255, 255, 255, 0.45);
-    --icon-active: #0a84ff; 
+    --icon-active: #0a84ff;
     --divider: rgba(255, 255, 255, 0.08);
-    
+
     /* Componentes del Dashboard */
     --card-bg: rgba(28, 28, 30, 0.6);
     --input-bg: rgba(0, 0, 0, 0.25);
@@ -87,7 +87,7 @@ body {
     background: var(--bg-color);
     color: var(--text-main);
     -webkit-font-smoothing: antialiased;
-    overflow: hidden; /* El scroll real ocurre dentro de .main-content, no en body */
+    overflow: hidden;
     transition: background 0.5s ease;
 }
 
@@ -113,8 +113,8 @@ body {
 .blob-3 { width: 35vw; height: 35vw; top: 30%; left: 40%; background: var(--blob-3); animation-delay: -12s; }
 
 @keyframes float {
-    0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-    50% { transform: translate(4%, 8%) scale(1.06) rotate(6deg); }
+    0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+    50%  { transform: translate(4%, 8%) scale(1.06) rotate(6deg); }
     100% { transform: translate(-2%, -4%) scale(0.95) rotate(-4deg); }
 }
 
@@ -134,7 +134,6 @@ body {
     z-index: 1;
 }
 
-/* Sidebar izquierda */
 .sidebar {
     padding: 24px 16px;
     display: flex;
@@ -172,7 +171,6 @@ body {
     z-index: 10;
 }
 
-/* Efecto reflejo del cristal en la parte superior */
 .liquid-nav::before {
     content: '';
     position: absolute;
@@ -186,7 +184,6 @@ body {
     z-index: 5;
 }
 
-/* Área de brillo dinámico por mouse (solo aplica con cursor, es decoración de escritorio) */
 .liquid-glare-container {
     position: absolute;
     inset: 0;
@@ -216,7 +213,6 @@ body {
     flex-grow: 1;
 }
 
-/* Cápsula/Píldora deslizante activa */
 .active-pill {
     position: absolute;
     top: 0;
@@ -231,7 +227,6 @@ body {
     pointer-events: none;
 }
 
-/* Botones de navegación */
 .nav-btn {
     position: relative;
     background: transparent;
@@ -279,7 +274,6 @@ body {
 .nav-btn.active { color: var(--text-main); }
 .nav-btn:hover:not(.active) { color: var(--text-main); }
 
-/* Líneas divisorias del menú */
 .divider, .menu-section-divider {
     width: 100%;
     height: 1px;
@@ -289,7 +283,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Selector de Tema (Dark/Light mode) */
 .theme-btn {
     background: transparent;
     border: none;
@@ -324,13 +317,12 @@ body {
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
 }
 
-.sun { opacity: 1; transform: rotate(0deg) scale(1); }
+.sun  { opacity: 1; transform: rotate(0deg) scale(1); }
 .moon { opacity: 0; transform: rotate(-90deg) scale(0); }
 
-[data-theme="dark"] .sun { opacity: 0; transform: rotate(90deg) scale(0); }
+[data-theme="dark"] .sun  { opacity: 0; transform: rotate(90deg) scale(0); }
 [data-theme="dark"] .moon { opacity: 1; transform: rotate(0deg) scale(1); }
 
-/* Perfil de Usuario en Sidebar */
 .user-profile {
     display: flex;
     align-items: center;
@@ -382,6 +374,43 @@ body {
 }
 
 /* ==========================================================================
+   8. BOTÓN DE CERRAR SESIÓN — ahora vive dentro del sidebar nav
+   ========================================================================== */
+.logout-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    width: 100%;
+    height: var(--nav-height);
+    background: rgba(255, 55, 95, 0.08);
+    border: 1px solid rgba(255, 55, 95, 0.2);
+    border-radius: 12px;
+    color: var(--danger-color);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    transition: background-color 0.2s, transform 0.1s;
+    z-index: 4;
+    flex-shrink: 0;
+}
+
+.logout-button:hover {
+    background: rgba(255, 55, 95, 0.15);
+}
+
+.logout-button:active {
+    transform: scale(0.97);
+}
+
+.logout-button:focus-visible {
+    outline: 2px solid var(--danger-color);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
    5. SECCIÓN PRINCIPAL (MAIN CONTENT) Y KPI CARDS
    ========================================================================== */
 .main-content {
@@ -395,9 +424,7 @@ body {
     min-width: 0;
 }
 
-.main-header {
-    min-width: 0;
-}
+.main-header { min-width: 0; }
 
 .main-header h1 {
     font-size: 30px;
@@ -412,7 +439,6 @@ body {
     margin-top: 2px;
 }
 
-/* Botón Añadir Registro (CRUD panel) */
 .crud-actions {
     display: flex;
     justify-content: flex-end;
@@ -426,6 +452,7 @@ body {
     border-radius: 12px;
     font-weight: 600;
     font-size: 14px;
+    font-family: inherit;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -448,7 +475,6 @@ body {
     transform: none;
 }
 
-/* Grid de Reportes Rápidos (Cards) */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -481,6 +507,17 @@ body {
     letter-spacing: -0.5px;
 }
 
+/* Estado de carga de las cards */
+.card-number.is-loading {
+    color: var(--text-sub);
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
 /* ==========================================================================
    6. CONTENEDORES DE INFORMACIÓN DINÁMICA (TABLAS Y PLACEHOLDERS)
    ========================================================================== */
@@ -507,7 +544,6 @@ body {
     font-weight: 700;
 }
 
-/* Marcador cuando no hay datos */
 .placeholder-content {
     padding: 48px 24px;
     text-align: center;
@@ -518,7 +554,11 @@ body {
     background: rgba(255, 255, 255, 0.02);
 }
 
-/* Contenedor Responsivo de Tablas */
+/* Estado de carga de la tabla */
+.placeholder-content.is-loading {
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
 .table-responsive {
     width: 100%;
     max-width: 100%;
@@ -531,7 +571,7 @@ body {
 
 .crud-table {
     width: 100%;
-    min-width: 560px; /* Fuerza scroll horizontal en vez de aplastar columnas ilegibles */
+    min-width: 560px;
     border-collapse: collapse;
     text-align: left;
     font-size: 14px;
@@ -564,15 +604,17 @@ body {
     border-bottom: none;
 }
 
-.crud-table tbody tr {
+/* cursor pointer solo en filas con datos reales, no en filas vacías */
+.crud-table tbody tr:not(.row-empty) {
     cursor: pointer;
     transition: background-color 0.15s ease;
 }
 
-.crud-table tbody tr:hover td {
+.crud-table tbody tr:not(.row-empty):hover td {
     background: rgba(0, 0, 0, 0.01);
 }
-[data-theme="dark"] .crud-table tbody tr:hover td {
+
+[data-theme="dark"] .crud-table tbody tr:not(.row-empty):hover td {
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -593,7 +635,6 @@ body {
     white-space: nowrap;
 }
 
-/* Botones de acción (editar/eliminar) dentro de las tablas */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -620,9 +661,7 @@ body {
     transform: translateY(-1px);
 }
 
-.btn-icon:active {
-    transform: scale(0.94);
-}
+.btn-icon:active { transform: scale(0.94); }
 
 .btn-icon.delete,
 .btn-icon.delete-btn {
@@ -701,6 +740,7 @@ body {
     transition: color 0.2s;
     padding: 4px 8px;
 }
+
 .btn-close-modal:hover { color: var(--text-main); }
 
 .modal-form {
@@ -710,7 +750,6 @@ body {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-right: 4px;
-    /* Permite hacer scroll dentro del modal cuando el formulario es largo (ej. Reservaciones) o el teclado tapa parte de la pantalla */
 }
 
 #modal-form-fields .form-group {
@@ -733,7 +772,7 @@ body {
     color: var(--text-sub);
 }
 
-#modal-form-fields input, 
+#modal-form-fields input,
 #modal-form-fields select {
     width: 100%;
     padding: 10px 14px;
@@ -749,7 +788,6 @@ body {
     appearance: none;
 }
 
-/* Flecha custom para selects (evita el estilo nativo feo de iOS/Android) */
 #modal-form-fields select {
     background-image: linear-gradient(45deg, transparent 50%, var(--text-sub) 50%), linear-gradient(135deg, var(--text-sub) 50%, transparent 50%);
     background-position: calc(100% - 18px) calc(1em + 1px), calc(100% - 13px) calc(1em + 1px);
@@ -758,7 +796,7 @@ body {
     padding-right: 36px;
 }
 
-#modal-form-fields input:focus, 
+#modal-form-fields input:focus,
 #modal-form-fields select:focus {
     border-color: var(--icon-active);
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
@@ -783,7 +821,6 @@ body {
     justify-content: center;
 }
 
-/* Ficha de detalle (vista de solo lectura dentro del modal) */
 .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -797,9 +834,7 @@ body {
     min-width: 0;
 }
 
-.detail-item.detail-full {
-    grid-column: 1 / -1;
-}
+.detail-item.detail-full { grid-column: 1 / -1; }
 
 .detail-item label {
     font-size: 12px;
@@ -813,32 +848,6 @@ body {
     font-size: 14px;
     font-weight: 500;
     overflow-wrap: break-word;
-}
-
-/* ==========================================================================
-   8. BOTÓN DE CERRAR SESIÓN (LOGOUT) - ESCRITORIO
-   ========================================================================== */
-.logout-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: rgba(255, 55, 95, 0.1);
-    border: 1px solid rgba(255, 55, 95, 0.3);
-    border-radius: 8px;
-    color: #ff375f;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-}
-
-.logout-button:hover {
-    background: rgba(255, 55, 95, 0.2);
-    transform: translateY(-2px);
 }
 
 /* ==========================================================================
@@ -863,12 +872,10 @@ body {
         height: 100%;
     }
 
-    /* Ocultar elementos decorativos o de escritorio */
     .sidebar-header, .user-profile, .divider, .menu-section-divider, .liquid-nav::before {
         display: none !important;
     }
 
-    /* Transformación de Sidebar a Tab-Bar inferior fija */
     .sidebar {
         position: fixed;
         bottom: 0;
@@ -882,6 +889,7 @@ body {
         -webkit-backdrop-filter: blur(40px) saturate(200%);
         border-top: 0.5px solid var(--divider);
     }
+
     [data-theme="dark"] .sidebar { background: rgba(20, 20, 20, 0.6); }
 
     .liquid-nav {
@@ -891,7 +899,7 @@ body {
         box-shadow: none;
         border: none;
         flex-direction: row;
-        padding: 4px 4px;
+        padding: 4px;
         height: 100%;
         border-radius: 0;
     }
@@ -906,7 +914,6 @@ body {
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Ajuste de Píldora Activa Móvil */
     .active-pill {
         height: 40px;
         width: 40px !important;
@@ -915,7 +922,6 @@ body {
         border-radius: 10px;
     }
 
-    /* Botones transformados a Tab Items */
     .nav-btn, .theme-btn {
         width: 40px;
         height: 40px;
@@ -938,14 +944,10 @@ body {
         height: 19px;
     }
 
-    /* Ocultar texto largo en móviles, mostrar solo iconos para evitar desborde */
-    .btn-content span {
-        display: none;
-    }
+    .btn-content span { display: none; }
 
     .nav-btn.active { color: var(--icon-active); }
 
-    /* Contenido Principal con Scroll Elástico */
     .main-content {
         padding: 20px 16px calc(80px + env(safe-area-inset-bottom, 0px)) 16px;
         gap: 18px;
@@ -955,19 +957,17 @@ body {
     }
 
     .main-header h1 { font-size: 22px; }
-    .main-header p { font-size: 13px; }
-    
+    .main-header p  { font-size: 13px; }
+
     .dashboard-cards {
         grid-template-columns: 1fr;
         gap: 12px;
     }
 
-    .card { padding: 18px; }
-    .card-number { font-size: 30px; }
+    .card          { padding: 18px; }
+    .card-number   { font-size: 30px; }
 
-    .crud-actions {
-        justify-content: stretch;
-    }
+    .crud-actions { justify-content: stretch; }
 
     .crud-actions .btn-primary {
         width: 100%;
@@ -976,20 +976,14 @@ body {
 
     .data-box { padding: 16px; }
 
-    /* En móvil reducimos el ancho mínimo de la tabla para que un celular grande
-       muestre algo razonable sin scroll horizontal excesivo en tablas simples */
     .crud-table {
         min-width: 480px;
         font-size: 13px;
     }
 
-    .crud-table th, .crud-table td {
-        padding: 12px 10px;
-    }
+    .crud-table th, .crud-table td { padding: 12px 10px; }
 
-    .action-buttons {
-        gap: 6px;
-    }
+    .action-buttons { gap: 6px; }
 
     .btn-icon {
         width: 30px;
@@ -997,7 +991,6 @@ body {
         min-width: 30px;
     }
 
-    /* Ajuste de Modal a ventana deslizante inferior (Bottom Sheet) */
     .modal-overlay {
         align-items: flex-end;
         padding: 0;
@@ -1012,26 +1005,18 @@ body {
         transform: translateY(100%);
     }
 
-    .modal-overlay.open .modal-card {
-        transform: translateY(0);
-    }
+    .modal-overlay.open .modal-card { transform: translateY(0); }
 
-    /* En pantallas angostas, los pares de campos (form-row) pasan a una sola columna
-       para que no queden inputs minúsculos e ilegibles */
     #modal-form-fields .form-row {
         grid-template-columns: 1fr;
         gap: 0;
     }
 
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
+    .detail-grid { grid-template-columns: 1fr; }
 
-    /* Reposicionar el botón de Logout a la barra inferior */
+    /* Logout en móvil — se convierte en tab icon */
     .logout-button {
         position: static;
-        top: auto;
-        right: auto;
         width: 40px;
         height: 40px;
         min-width: 40px;
@@ -1042,17 +1027,11 @@ body {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #ff375f;
         flex-shrink: 0;
     }
 
-    /* Ocultar el texto de "Cerrar sesión" en móvil */
-    .logout-button span,
-    .logout-button::after,
-    .logout-button text {
-        display: none !important;
-    }
-    
+    .logout-button span { display: none !important; }
+
     .logout-button svg {
         width: 19px;
         height: 19px;
@@ -1064,10 +1043,8 @@ body {
         transform: none;
     }
 
-    /* ===== Reportes en móvil ===== */
-    .reports-container {
-        padding: 0;
-    }
+    /* Reportes en móvil */
+    .reports-container { padding: 0; }
 
     .report-controls {
         flex-direction: column;
@@ -1105,13 +1082,10 @@ body {
     }
 }
 
-/* ========================================== */
-/* ESTILOS PARA REPORTES */
-/* ========================================== */
-
-.reports-container {
-    padding: 20px;
-}
+/* ==========================================================================
+   11. ESTILOS PARA REPORTES
+   ========================================================================== */
+.reports-container { padding: 20px; }
 
 .reports-header h3 {
     font-size: 24px;
@@ -1151,15 +1125,27 @@ body {
     color: var(--text-sub);
 }
 
+/* Inputs y selects de reportes — consistentes con los del modal */
 .report-type-group select,
 .date-range-group input {
-    padding: 10px 12px;
+    padding: 10px 14px;
     border-radius: 10px;
     border: 1px solid var(--glass-border);
     background: var(--input-bg);
     color: var(--text-main);
     font-family: inherit;
+    font-size: 14px;
     cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.report-type-group select:focus,
+.date-range-group input:focus {
+    border-color: var(--icon-active);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
 }
 
 .report-actions {
@@ -1174,14 +1160,14 @@ body {
     padding: 10px 20px;
     border-radius: 12px;
     font-weight: 600;
+    font-family: inherit;
     cursor: pointer;
     color: var(--text-main);
     transition: background-color 0.2s, transform 0.15s;
 }
 
-.btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
+.btn-secondary:hover { background: rgba(0, 0, 0, 0.05); }
+
 [data-theme="dark"] .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.08);
 }
@@ -1196,13 +1182,8 @@ body {
     border: 1px solid var(--glass-border);
 }
 
-.report-preview h4 {
-    margin-bottom: 16px;
-}
-
-.saved-reports h4 {
-    margin-bottom: 16px;
-}
+.report-preview h4 { margin-bottom: 16px; }
+.saved-reports h4  { margin-bottom: 16px; }
 
 #preview-content {
     max-height: 400px;
@@ -1239,20 +1220,15 @@ body {
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 12px;
+    font-family: inherit;
     transition: background-color 0.2s;
 }
 
-.btn-icon-sm:hover {
-    background: rgba(0, 0, 0, 0.06);
-}
+.btn-icon-sm:hover { background: rgba(0, 0, 0, 0.06); }
+
 [data-theme="dark"] .btn-icon-sm:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
-.btn-download {
-    color: var(--icon-active);
-}
-
-.btn-delete {
-    color: #ff375f;
-}
+.btn-download { color: var(--icon-active); }
+.btn-delete   { color: var(--danger-color); }
