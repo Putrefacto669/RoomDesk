@@ -1232,3 +1232,87 @@ body {
 
 .btn-download { color: var(--icon-active); }
 .btn-delete   { color: var(--danger-color); }
+
+/* ==========================================================================
+   12. MODO OFFLINE — badge de estado y estilos relacionados
+   ========================================================================== */
+
+/* Ajuste del header para acomodar el badge */
+.header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+/* Badge de estado offline/sincronizando */
+.offline-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Offline — rojo */
+.offline-badge.badge-offline {
+    background: rgba(255, 55, 95, 0.1);
+    border: 1px solid rgba(255, 55, 95, 0.25);
+    color: var(--danger-color);
+}
+
+/* Sincronizando — naranja */
+.offline-badge.badge-syncing {
+    background: rgba(255, 159, 10, 0.1);
+    border: 1px solid rgba(255, 159, 10, 0.25);
+    color: var(--warning-color);
+}
+
+/* Punto de estado animado */
+.offline-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 1.4s ease-in-out infinite;
+}
+
+.badge-offline .offline-dot  { background: var(--danger-color); }
+.badge-syncing .offline-dot  { background: var(--warning-color); }
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+/* Indicador en tabla — registros creados offline */
+.offline-indicator {
+    font-size: 11px;
+    margin-left: 4px;
+    opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .offline-dot { animation: none; }
+}
+
+/* Mobile: badge en header compacto */
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .offline-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+}
