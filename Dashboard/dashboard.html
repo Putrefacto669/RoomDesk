@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="RoomDesk — Panel de administración hotelera. Gestiona reservaciones, huéspedes y habitaciones desde un solo lugar.">
+    <meta name="description"
+        content="RoomDesk — Panel de administración hotelera. Gestiona reservaciones, huéspedes y habitaciones desde un solo lugar.">
     <title>RoomDesk — Dashboard</title>
     <link rel="stylesheet" href="dashboardstyle.css">
 </head>
@@ -21,11 +22,44 @@
     <div class="dashboard-container">
 
         <!-- ================================================
-             SIDEBAR
+             HEADER MÓVIL (solo visible en pantallas <=768px)
              ================================================ -->
-        <aside class="sidebar">
+        <header class="mobile-header">
+            <button class="btn-hamburger" id="btn-hamburger" aria-label="Abrir menú">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="header-title">
+                <h1>RoomDesk</h1>
+            </div>
+            <div class="header-actions">
+                <div id="offline-badge-mobile" class="offline-badge" role="status" aria-live="polite"
+                    style="display:none;">
+                    <span class="offline-dot" aria-hidden="true"></span>
+                    <span id="offline-text-mobile">Offline</span>
+                </div>
+                <div class="avatar-circle-mobile" aria-hidden="true">O</div>
+            </div>
+        </header>
+
+        <!-- Backdrop oscuro detrás del drawer en móvil -->
+        <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+
+        <!-- ================================================
+             SIDEBAR (se convierte en drawer en móvil)
+             ================================================ -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2>RoomDesk</h2>
+                <button class="btn-close-drawer" id="btn-close-drawer" aria-label="Cerrar menú">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
 
             <nav class="liquid-nav" id="nav" aria-label="Navegación principal">
@@ -39,7 +73,8 @@
 
                     <button class="nav-btn active" aria-current="page">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
@@ -49,8 +84,11 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
                             </svg>
                             <span>Reservaciones</span>
                         </div>
@@ -58,7 +96,8 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <line x1="8" y1="6" x2="21" y2="6"></line>
                                 <line x1="8" y1="12" x2="21" y2="12"></line>
                                 <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -72,7 +111,8 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="9" y1="3" x2="9" y2="21"></line>
                             </svg>
@@ -84,7 +124,8 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <line x1="18" y1="20" x2="18" y2="10"></line>
                                 <line x1="12" y1="20" x2="12" y2="4"></line>
                                 <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -95,7 +136,8 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                             </svg>
                             <span>Consumo</span>
@@ -104,8 +146,11 @@
 
                     <button class="nav-btn">
                         <div class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path
+                                    d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+                                </path>
                                 <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
                             </svg>
                             <span>Config. Canal</span>
@@ -117,7 +162,8 @@
 
                 <button class="theme-btn" id="theme-btn" aria-label="Cambiar entre modo claro y oscuro">
                     <div class="theme-icon-wrapper" aria-hidden="true">
-                        <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -128,7 +174,8 @@
                             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                         </svg>
-                        <svg class="moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </div>
@@ -138,7 +185,8 @@
 
                 <div class="user-profile">
                     <div class="avatar-wrapper" aria-hidden="true">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
@@ -152,7 +200,8 @@
                 <div class="divider" role="separator"></div>
 
                 <button id="logout-btn" class="logout-button" aria-label="Cerrar sesión">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        aria-hidden="true">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>
                         <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -175,7 +224,8 @@
                         <p id="crud-subtitle">Aquí tienes el resumen del día.</p>
                     </div>
                     <!-- Badge de estado offline — oculto por defecto, JS lo muestra -->
-                    <div id="offline-badge" class="offline-badge" role="status" aria-live="polite" style="display:none;">
+                    <div id="offline-badge" class="offline-badge" role="status" aria-live="polite"
+                        style="display:none;">
                         <span class="offline-dot" aria-hidden="true"></span>
                         <span id="offline-text">Sin conexión</span>
                     </div>
@@ -184,7 +234,8 @@
 
             <div class="crud-actions" id="crud-actions-panel" style="display: none;">
                 <button class="btn-primary" id="btn-add-record">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        aria-hidden="true">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
@@ -235,12 +286,13 @@
                         </div>
                         <div class="report-actions">
                             <button id="btn-generate-pdf" class="btn-primary">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                    <polyline points="10 9 9 9 8 9"/>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" aria-hidden="true">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                    <polyline points="10 9 9 9 8 9" />
                                 </svg>
                                 Generar PDF
                             </button>
@@ -259,7 +311,11 @@
                             <table class="crud-table" id="reports-table">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th><th>Tipo</th><th>Fecha</th><th>Tamaño</th><th>Acciones</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Tamaño</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="reports-table-body">
@@ -339,7 +395,53 @@
                 }
             });
         }
+
+        // ============================================================
+        // Drawer móvil — abrir/cerrar el menú lateral
+        // ============================================================
+        const btnHamburger = document.getElementById('btn-hamburger');
+        const btnCloseDrawer = document.getElementById('btn-close-drawer');
+        const drawerBackdrop = document.getElementById('drawer-backdrop');
+        const sidebarEl = document.getElementById('sidebar');
+
+        function openDrawer() {
+            sidebarEl.classList.add('open');
+            drawerBackdrop.classList.add('open');
+        }
+        function closeDrawer() {
+            sidebarEl.classList.remove('open');
+            drawerBackdrop.classList.remove('open');
+        }
+
+        if (btnHamburger) btnHamburger.addEventListener('click', openDrawer);
+        if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+        // Cierra el drawer automáticamente al elegir una sección (móvil)
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeDrawer();
+            });
+        });
+
+        // Sincroniza el badge offline del header móvil con el del desktop
+        function syncMobileOfflineBadge() {
+            const desktopBadge = document.getElementById('offline-badge');
+            const mobileBadge = document.getElementById('offline-badge-mobile');
+            const mobileText = document.getElementById('offline-text-mobile');
+            if (!desktopBadge || !mobileBadge) return;
+            const visible = desktopBadge.style.display !== 'none';
+            mobileBadge.style.display = visible ? 'flex' : 'none';
+            mobileBadge.className = desktopBadge.className;
+            if (mobileText) mobileText.textContent = document.getElementById('offline-text')?.textContent || 'Offline';
+        }
+        const offlineBadgeObserver = new MutationObserver(syncMobileOfflineBadge);
+        const offlineBadgeEl = document.getElementById('offline-badge');
+        if (offlineBadgeEl) {
+            offlineBadgeObserver.observe(offlineBadgeEl, { attributes: true, childList: true, subtree: true });
+        }
     </script>
 
 </body>
+
 </html>
